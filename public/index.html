@@ -2,24 +2,52 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Space</title>
+    <title>Our Space ❤️</title>
     <style>
         body { font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; margin: 0; background: #fff0f5; }
+        
+        /* Gallery Area */
+        #gallery { display: flex; overflow-x: auto; padding: 10px; background: #fff; height: 150px; flex-shrink: 0; border-bottom: 1px solid #ddd; }
+        #gallery img { height: 100%; margin-right: 10px; border-radius: 10px; border: 2px solid #ff4081; }
+
+        /* Chat Area */
         #messages { list-style: none; padding: 10px; flex-grow: 1; overflow-y: scroll; }
         #messages li { background: white; padding: 10px; margin: 5px; border-radius: 20px; max-width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        form { display: flex; padding: 10px; background: white; border-top: 1px solid #ccc; }
+        
+        /* Input Area */
+        form { display: flex; padding: 10px; background: white; border-top: 1px solid #ccc; align-items: center;}
         input { flex-grow: 1; padding: 10px; border-radius: 20px; border: 1px solid #ddd; }
         button { margin-left: 10px; padding: 10px 20px; background: #ff4081; color: white; border: none; border-radius: 20px; }
+        
+        /* Camera Button */
+        .file-upload { position: relative; overflow: hidden; margin-right: 10px; }
+        .file-upload input { position: absolute; font-size: 100px; opacity: 0; right: 0; top: 0; }
+        .camera-btn { background: #ddd; color: #333; padding: 10px; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
     </style>
 </head>
 <body>
+    <div id="gallery"></div>
+
     <ul id="messages"></ul>
-    <form id="form"><input id="input" autocomplete="off" /><button>Send</button></form>
+
+    <form id="form">
+        <div class="file-upload">
+            <div class="camera-btn">📷</div>
+            <input type="file" id="photoInput" accept="image/*" onchange="uploadPhoto()"/>
+        </div>
+        
+        <input id="input" autocomplete="off" placeholder="Message..." />
+        <button>Send</button>
+    </form>
+
     <script src="/socket.io/socket.io.js"></script>
     <script>
         var socket = io();
         var form = document.getElementById('form');
         var input = document.getElementById('input');
+        var gallery = document.getElementById('gallery');
+
+        // Chat Logic
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             if (input.value) { socket.emit('chat message', input.value); input.value = ''; }
@@ -29,6 +57,24 @@
             item.textContent = msg;
             document.getElementById('messages').appendChild(item);
             window.scrollTo(0, document.body.scrollHeight);
+        });
+
+        // Photo Logic
+        function uploadPhoto() {
+            var file = document.getElementById('photoInput').files[0];
+            var formData = new FormData();
+            formData.append('photo', file);
+
+            fetch('/upload', { method: 'POST', body: formData })
+            .then(response => console.log('Uploaded!'))
+            .catch(error => console.error('Error:', error));
+        }
+
+        socket.on('new photo', function(url) {
+            var img = document.createElement('img');
+            img.src = url;
+            // Add new photo to the START of the gallery
+            gallery.insertBefore(img, gallery.firstChild);
         });
     </script>
 </body>
