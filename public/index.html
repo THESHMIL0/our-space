@@ -1,80 +1,184 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Space ❤️</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Our World ❤️</title>
     <style>
-        body { font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; margin: 0; background: #fff0f5; }
-        
-        /* Gallery Area */
-        #gallery { display: flex; overflow-x: auto; padding: 10px; background: #fff; height: 150px; flex-shrink: 0; border-bottom: 1px solid #ddd; }
-        #gallery img { height: 100%; margin-right: 10px; border-radius: 10px; border: 2px solid #ff4081; }
+        /* PHONE OS STYLES */
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            margin: 0; padding: 0; 
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%); 
+            height: 100vh; 
+            overflow: hidden; 
+            display: flex; flex-direction: column; align-items: center; 
+        }
 
-        /* Chat Area */
-        #messages { list-style: none; padding: 10px; flex-grow: 1; overflow-y: scroll; }
-        #messages li { background: white; padding: 10px; margin: 5px; border-radius: 20px; max-width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        /* Lock Screen Clock */
+        #clock-widget { margin-top: 60px; color: white; text-align: center; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        #time { font-size: 80px; font-weight: 200; margin: 0; }
+        #date { font-size: 20px; font-weight: 400; }
+
+        /* App Grid */
+        #home-screen { display: flex; gap: 30px; margin-top: 50px; }
+        .app-icon { 
+            width: 70px; height: 70px; 
+            border-radius: 18px; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 35px; 
+            cursor: pointer; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
+            transition: transform 0.1s;
+            position: relative;
+            background: white;
+        }
+        .app-icon:active { transform: scale(0.95); }
+        .app-label { margin-top: 8px; font-size: 12px; color: white; text-align: center; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
         
-        /* Input Area */
-        form { display: flex; padding: 10px; background: white; border-top: 1px solid #ccc; align-items: center;}
-        input { flex-grow: 1; padding: 10px; border-radius: 20px; border: 1px solid #ddd; }
-        button { margin-left: 10px; padding: 10px 20px; background: #ff4081; color: white; border: none; border-radius: 20px; }
+        /* App Window (Hidden by default) */
+        .app-window { 
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 0; 
+            background: white; 
+            transition: height 0.3s ease-out; 
+            display: flex; flex-direction: column; 
+            border-top-left-radius: 20px; border-top-right-radius: 20px; 
+            overflow: hidden; 
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+        .app-header { 
+            padding: 15px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            background: #f8f8f8; border-bottom: 1px solid #eee; font-weight: bold; 
+        }
+        .close-btn { color: #007aff; cursor: pointer; font-size: 16px; }
+
+        /* CHAT APP STYLES */
+        #messages { list-style: none; padding: 15px; flex-grow: 1; overflow-y: auto; background: #fff; }
+        #messages li { padding: 10px 15px; margin-bottom: 8px; border-radius: 18px; max-width: 70%; word-wrap: break-word; font-size: 16px; }
+        .my-msg { background: #007aff; color: white; align-self: flex-end; margin-left: auto; }
+        .her-msg { background: #e5e5ea; color: black; align-self: flex-start; }
         
-        /* Camera Button */
-        .file-upload { position: relative; overflow: hidden; margin-right: 10px; }
-        .file-upload input { position: absolute; font-size: 100px; opacity: 0; right: 0; top: 0; }
-        .camera-btn { background: #ddd; color: #333; padding: 10px; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        form { display: flex; padding: 10px; background: #f0f0f0; border-top: 1px solid #ddd; }
+        input { flex-grow: 1; padding: 12px; border-radius: 20px; border: 1px solid #ccc; font-size: 16px; outline: none; }
+        button { margin-left: 10px; background: #007aff; color: white; border: none; padding: 10px 15px; border-radius: 50%; font-weight: bold; }
+
+        /* GALLERY APP STYLES */
+        #gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 2px; overflow-y: auto; }
+        #gallery-grid img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+        .upload-btn-wrapper { padding: 10px; text-align: center; border-top: 1px solid #eee; }
     </style>
 </head>
 <body>
-    <div id="gallery"></div>
 
-    <ul id="messages"></ul>
+    <div id="clock-widget">
+        <h1 id="time">12:00</h1>
+        <p id="date">Monday, Feb 14</p>
+    </div>
 
-    <form id="form">
-        <div class="file-upload">
-            <div class="camera-btn">📷</div>
-            <input type="file" id="photoInput" accept="image/*" onchange="uploadPhoto()"/>
+    <div id="home-screen">
+        <div onclick="openApp('messageApp')">
+            <div class="app-icon" style="background: #4cd964; color: white;">💬</div>
+            <div class="app-label">Messages</div>
         </div>
-        
-        <input id="input" autocomplete="off" placeholder="Message..." />
-        <button>Send</button>
-    </form>
+
+        <div onclick="openApp('galleryApp')">
+            <div class="app-icon" style="background: linear-gradient(to bottom right, #ffcc00, #ff9500);">🌻</div>
+            <div class="app-label">Gallery</div>
+        </div>
+    </div>
+
+    <div id="messageApp" class="app-window">
+        <div class="app-header">
+            <span>Chat</span>
+            <span class="close-btn" onclick="closeApp('messageApp')">Close</span>
+        </div>
+        <ul id="messages"></ul>
+        <form id="chat-form">
+            <input id="chat-input" autocomplete="off" placeholder="iMessage" />
+            <button type="submit">⬆</button>
+        </form>
+    </div>
+
+    <div id="galleryApp" class="app-window">
+        <div class="app-header">
+            <span>Photos</span>
+            <span class="close-btn" onclick="closeApp('galleryApp')">Close</span>
+        </div>
+        <div id="gallery-grid"></div>
+        <div class="upload-btn-wrapper">
+            <input type="file" id="photoInput" accept="image/*" onchange="uploadPhoto()" style="display:none">
+            <button onclick="document.getElementById('photoInput').click()" style="width:100%; border-radius: 10px;">+ Add Photo</button>
+        </div>
+    </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        var socket = io();
-        var form = document.getElementById('form');
-        var input = document.getElementById('input');
-        var gallery = document.getElementById('gallery');
+        // CLOCK LOGIC
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('time').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('date').innerText = now.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
 
-        // Chat Logic
-        form.addEventListener('submit', function(e) {
+        // APP OPEN/CLOSE LOGIC
+        function openApp(id) { document.getElementById(id).style.height = "100%"; }
+        function closeApp(id) { document.getElementById(id).style.height = "0"; }
+
+        // SOCKET LOGIC
+        var socket = io();
+        var messages = document.getElementById('messages');
+        var input = document.getElementById('chat-input');
+
+        // 1. Submit Message
+        document.getElementById('chat-form').addEventListener('submit', function(e) {
             e.preventDefault();
-            if (input.value) { socket.emit('chat message', input.value); input.value = ''; }
+            if (input.value) {
+                socket.emit('chat message', input.value);
+                input.value = '';
+            }
         });
+
+        // 2. Receive Message (Live)
         socket.on('chat message', function(msg) {
+            addMessageToScreen(msg);
+        });
+
+        // 3. Load History (When you first join)
+        socket.on('load history', function(history) {
+            messages.innerHTML = ""; // Clear list
+            history.forEach(function(msg) {
+                addMessageToScreen(msg);
+            });
+        });
+
+        function addMessageToScreen(msg) {
             var item = document.createElement('li');
             item.textContent = msg;
-            document.getElementById('messages').appendChild(item);
-            window.scrollTo(0, document.body.scrollHeight);
-        });
+            // Simple logic: If I typed it, it's mine (blue). This is a basic guess for now.
+            // Since we don't have login, all messages look the same, but we style them nicely.
+            item.classList.add('her-msg'); 
+            messages.appendChild(item);
+            messages.scrollTop = messages.scrollHeight;
+        }
 
-        // Photo Logic
+        // PHOTO LOGIC
         function uploadPhoto() {
             var file = document.getElementById('photoInput').files[0];
             var formData = new FormData();
             formData.append('photo', file);
 
             fetch('/upload', { method: 'POST', body: formData })
-            .then(response => console.log('Uploaded!'))
-            .catch(error => console.error('Error:', error));
+            .then(res => console.log('Sent'))
+            .catch(err => console.error(err));
         }
 
-        socket.on('new photo', function(url) {
+        socket.on('new photo', function(filename) {
             var img = document.createElement('img');
-            img.src = url;
-            // Add new photo to the START of the gallery
-            gallery.insertBefore(img, gallery.firstChild);
+            img.src = '/uploads/' + filename;
+            document.getElementById('gallery-grid').prepend(img);
         });
     </script>
 </body>
