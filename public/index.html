@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Our World ❤️</title>
     <style>
-        /* PHONE OS STYLES */
+        /* --- GLOBAL STYLES --- */
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
             margin: 0; padding: 0; 
@@ -14,12 +14,12 @@
             display: flex; flex-direction: column; align-items: center; 
         }
 
-        /* Lock Screen Clock */
+        /* --- CLOCK & WIDGETS --- */
         #clock-widget { margin-top: 60px; color: white; text-align: center; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         #time { font-size: 80px; font-weight: 200; margin: 0; }
         #date { font-size: 20px; font-weight: 400; }
 
-        /* App Grid */
+        /* --- HOME SCREEN ICONS --- */
         #home-screen { display: flex; gap: 30px; margin-top: 50px; }
         .app-icon { 
             width: 70px; height: 70px; 
@@ -34,12 +34,12 @@
         }
         .app-icon:active { transform: scale(0.95); }
         .app-label { margin-top: 8px; font-size: 12px; color: white; text-align: center; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
-        
-        /* App Window (Hidden by default) */
+
+        /* --- APP WINDOW --- */
         .app-window { 
             position: absolute; bottom: 0; left: 0; width: 100%; height: 0; 
             background: white; 
-            transition: height 0.3s ease-out; 
+            transition: height 0.3s cubic-bezier(0.25, 0.1, 0.25, 1); /* Smooth Slide */
             display: flex; flex-direction: column; 
             border-top-left-radius: 20px; border-top-right-radius: 20px; 
             overflow: hidden; 
@@ -49,24 +49,76 @@
         .app-header { 
             padding: 15px; 
             display: flex; justify-content: space-between; align-items: center; 
-            background: #f8f8f8; border-bottom: 1px solid #eee; font-weight: bold; 
+            background: rgba(255,255,255,0.95); 
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #eee; font-weight: bold; font-size: 17px;
+            z-index: 2;
         }
-        .close-btn { color: #007aff; cursor: pointer; font-size: 16px; }
+        .close-btn { color: #007aff; cursor: pointer; font-size: 16px; font-weight: normal;}
 
-        /* CHAT APP STYLES */
-        #messages { list-style: none; padding: 15px; flex-grow: 1; overflow-y: auto; background: #fff; }
-        #messages li { padding: 10px 15px; margin-bottom: 8px; border-radius: 18px; max-width: 70%; word-wrap: break-word; font-size: 16px; }
-        .my-msg { background: #007aff; color: white; align-self: flex-end; margin-left: auto; }
-        .her-msg { background: #e5e5ea; color: black; align-self: flex-start; }
+        /* --- BEAUTIFUL CHAT STYLES --- */
+        #messages { 
+            list-style: none; 
+            padding: 20px; 
+            flex-grow: 1; 
+            overflow-y: auto; 
+            /* Cute Background Pattern */
+            background-color: #f5f5f7;
+            background-image: radial-gradient(#e4e4e4 1px, transparent 1px);
+            background-size: 20px 20px;
+            display: flex;
+            flex-direction: column;
+        }
         
-        form { display: flex; padding: 10px; background: #f0f0f0; border-top: 1px solid #ddd; }
-        input { flex-grow: 1; padding: 12px; border-radius: 20px; border: 1px solid #ccc; font-size: 16px; outline: none; }
-        button { margin-left: 10px; background: #007aff; color: white; border: none; padding: 10px 15px; border-radius: 50%; font-weight: bold; }
+        #messages li { 
+            padding: 10px 16px; 
+            margin-bottom: 8px; 
+            border-radius: 20px; 
+            max-width: 75%; 
+            word-wrap: break-word; 
+            font-size: 16px; 
+            line-height: 1.4;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            animation: popIn 0.3s ease-out;
+            position: relative;
+        }
 
-        /* GALLERY APP STYLES */
+        /* Message Bubbles */
+        .my-msg { 
+            background: linear-gradient(135deg, #007aff, #005ecb); /* Blue Gradient */
+            color: white; 
+            align-self: flex-end; 
+            border-bottom-right-radius: 5px !important;
+        }
+        .her-msg { 
+            background: white; 
+            color: black; 
+            align-self: flex-start; 
+            border-bottom-left-radius: 5px !important;
+        }
+
+        /* Animation for new messages */
+        @keyframes popIn {
+            0% { opacity: 0; transform: translateY(10px) scale(0.9); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Typing Area */
+        form { display: flex; padding: 10px 15px; background: white; border-top: 1px solid #eee; align-items: center; }
+        input { 
+            flex-grow: 1; padding: 10px 15px; border-radius: 20px; border: 1px solid #ddd; font-size: 16px; outline: none; background: #f2f2f2; 
+        }
+        button { 
+            margin-left: 10px; background: #007aff; color: white; border: none; 
+            width: 35px; height: 35px; border-radius: 50%; font-weight: bold; 
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* --- GALLERY GRID --- */
         #gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 2px; overflow-y: auto; }
         #gallery-grid img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
-        .upload-btn-wrapper { padding: 10px; text-align: center; border-top: 1px solid #eee; }
+        .upload-btn-wrapper { padding: 15px; text-align: center; background: white; border-top: 1px solid #eee; }
+        .pretty-btn { background: #ff4081; color: white; padding: 12px; width: 100%; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; }
     </style>
 </head>
 <body>
@@ -78,10 +130,9 @@
 
     <div id="home-screen">
         <div onclick="openApp('messageApp')">
-            <div class="app-icon" style="background: #4cd964; color: white;">💬</div>
+            <div class="app-icon" style="background: linear-gradient(to bottom, #4cd964, #34a853); color: white;">💬</div>
             <div class="app-label">Messages</div>
         </div>
-
         <div onclick="openApp('galleryApp')">
             <div class="app-icon" style="background: linear-gradient(to bottom right, #ffcc00, #ff9500);">🌻</div>
             <div class="app-label">Gallery</div>
@@ -90,7 +141,7 @@
 
     <div id="messageApp" class="app-window">
         <div class="app-header">
-            <span>Chat</span>
+            <span>My Love ❤️</span>
             <span class="close-btn" onclick="closeApp('messageApp')">Close</span>
         </div>
         <ul id="messages"></ul>
@@ -102,19 +153,19 @@
 
     <div id="galleryApp" class="app-window">
         <div class="app-header">
-            <span>Photos</span>
+            <span>Our Memories</span>
             <span class="close-btn" onclick="closeApp('galleryApp')">Close</span>
         </div>
         <div id="gallery-grid"></div>
         <div class="upload-btn-wrapper">
             <input type="file" id="photoInput" accept="image/*" onchange="uploadPhoto()" style="display:none">
-            <button onclick="document.getElementById('photoInput').click()" style="width:100%; border-radius: 10px;">+ Add Photo</button>
+            <button class="pretty-btn" onclick="document.getElementById('photoInput').click()">+ Add New Memory</button>
         </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        // CLOCK LOGIC
+        // --- CLOCK ---
         function updateClock() {
             const now = new Date();
             document.getElementById('time').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -123,63 +174,76 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // APP OPEN/CLOSE LOGIC
+        // --- APP NAVIGATION ---
         function openApp(id) { document.getElementById(id).style.height = "100%"; }
         function closeApp(id) { document.getElementById(id).style.height = "0"; }
 
-        // SOCKET LOGIC
+        // --- CHAT LOGIC ---
         var socket = io();
         var messages = document.getElementById('messages');
         var input = document.getElementById('chat-input');
 
-        // 1. Submit Message
+        // 1. I SEND A MESSAGE
         document.getElementById('chat-form').addEventListener('submit', function(e) {
             e.preventDefault();
             if (input.value) {
+                // Add to MY screen immediately (Right side, Blue)
+                addMessageToScreen(input.value, 'my-msg');
+                // Send to server (so she gets it)
                 socket.emit('chat message', input.value);
                 input.value = '';
             }
         });
 
-        // 2. Receive Message (Live)
+        // 2. I RECEIVE A MESSAGE (From Her)
         socket.on('chat message', function(msg) {
-            addMessageToScreen(msg);
+            // Add to screen (Left side, White)
+            addMessageToScreen(msg, 'her-msg');
         });
 
-        // 3. Load History (When you first join)
+        // 3. LOAD HISTORY
         socket.on('load history', function(history) {
-            messages.innerHTML = ""; // Clear list
-            history.forEach(function(msg) {
-                addMessageToScreen(msg);
+            messages.innerHTML = "";
+            history.forEach(function(item) {
+                // For history, we just show them as "her" messages for now to keep it simple,
+                // or we can try to guess. Let's make them all white bubbles for history.
+                addMessageToScreen(item.text, 'her-msg');
             });
         });
 
-        function addMessageToScreen(msg) {
+        function addMessageToScreen(text, className) {
             var item = document.createElement('li');
-            item.textContent = msg;
-            // Simple logic: If I typed it, it's mine (blue). This is a basic guess for now.
-            // Since we don't have login, all messages look the same, but we style them nicely.
-            item.classList.add('her-msg'); 
+            item.textContent = text;
+            item.classList.add(className);
             messages.appendChild(item);
             messages.scrollTop = messages.scrollHeight;
         }
 
-        // PHOTO LOGIC
+        // --- PHOTO LOGIC ---
         function uploadPhoto() {
             var file = document.getElementById('photoInput').files[0];
             var formData = new FormData();
             formData.append('photo', file);
 
-            fetch('/upload', { method: 'POST', body: formData })
-            .then(res => console.log('Sent'))
-            .catch(err => console.error(err));
+            // Add to MY gallery immediately
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                addPhotoToGrid(e.target.result);
+            }
+            reader.readAsDataURL(file);
+
+            fetch('/upload', { method: 'POST', body: formData });
         }
 
         socket.on('new photo', function(filename) {
-            var img = document.createElement('img');
-            img.src = '/uploads/' + filename;
-            document.getElementById('gallery-grid').prepend(img);
+            addPhotoToGrid('/uploads/' + filename);
         });
+
+        function addPhotoToGrid(src) {
+            var img = document.createElement('img');
+            img.src = src;
+            document.getElementById('gallery-grid').prepend(img);
+        }
     </script>
 </body>
 </html>
