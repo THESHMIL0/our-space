@@ -9,51 +9,48 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// 1. Setup Photo Storage (Save photos in a folder called 'uploads')
+// --- 1. MEMORY STORAGE (Saves messages while server is running) ---
+let chatHistory = []; 
+
+// Setup Photo Storage
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        const dir = './public/uploads';
-        if (!fs.existsSync(dir)){
-            fs.mkdirSync(dir, { recursive: true });
-        }
+        const dir = '/tmp/uploads'; // Use /tmp for Render (Temporary storage)
+        if (!fs.existsSync(dir)){ fs.mkdirSync(dir, { recursive: true }); }
         cb(null, dir);
     },
     filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname); // Unique name
+        cb(null, Date.now() + '-' + file.originalname);
     }
 });
 const upload = multer({ storage: storage });
 
 app.use(express.static(path.join(__dirname, 'public')));
+// Allow accessing uploaded photos
+app.use('/uploads', express.static('/tmp/uploads'));
 
-// 2. Handle Photo Uploads
+// Upload Route
 app.post('/upload', upload.single('photo'), (req, res) => {
     if(req.file) {
-        // Tell everyone a new photo is ready!
-        io.emit('new photo', `/uploads/${req.file.filename}`);
+        io.emit('new photo', req.file.filename); // Send just the filename
         res.json({ success: true });
-    } else {
-        res.status(400).send('No file uploaded.');
-    }
+    } else { res.status(400).send('No file.'); }
 });
 
-// 3. Chat Logic
+// Socket Logic
 io.on('connection', (socket) => {
     console.log('User connected');
 
-    // Load existing photos for new user
-    const uploadDir = path.join(__dirname, 'public/uploads');
-    if (fs.existsSync(uploadDir)) {
-        fs.readdir(uploadDir, (err, files) => {
-            if (files) {
-                files.forEach(file => {
-                    socket.emit('new photo', `/uploads/${file}`);
-                });
-            }
-        });
-    }
+    // 1. Send OLD messages to the new user immediately
+    socket.emit('load history', chatHistory);
 
+    // 2. Listen for new messages
     socket.on('chat message', (msg) => {
+        // Save to memory
+        chatHistory.push(msg);
+        if(chatHistory.length > 50) chatHistory.shift(); // Keep only last 50
+        
+        // Send to everyone
         io.emit('chat message', msg);
     });
 });
