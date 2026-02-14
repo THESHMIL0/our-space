@@ -9,13 +9,12 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// --- 1. MEMORY STORAGE (Saves messages while server is running) ---
+// Memory
 let chatHistory = []; 
 
-// Setup Photo Storage
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        const dir = '/tmp/uploads'; // Use /tmp for Render (Temporary storage)
+        const dir = '/tmp/uploads'; 
         if (!fs.existsSync(dir)){ fs.mkdirSync(dir, { recursive: true }); }
         cb(null, dir);
     },
@@ -26,32 +25,30 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 app.use(express.static(path.join(__dirname, 'public')));
-// Allow accessing uploaded photos
 app.use('/uploads', express.static('/tmp/uploads'));
 
-// Upload Route
 app.post('/upload', upload.single('photo'), (req, res) => {
     if(req.file) {
-        io.emit('new photo', req.file.filename); // Send just the filename
-        res.json({ success: true });
+        // CHANGED: Send photo to everyone else
+        socket.broadcast.emit('new photo', req.file.filename);
+        res.json({ success: true, filename: req.file.filename });
     } else { res.status(400).send('No file.'); }
 });
 
-// Socket Logic
 io.on('connection', (socket) => {
     console.log('User connected');
 
-    // 1. Send OLD messages to the new user immediately
+    // Send history
     socket.emit('load history', chatHistory);
 
-    // 2. Listen for new messages
     socket.on('chat message', (msg) => {
         // Save to memory
-        chatHistory.push(msg);
-        if(chatHistory.length > 50) chatHistory.shift(); // Keep only last 50
+        const messageData = { text: msg, sender: 'them' }; // We save it as "them" for history purposes
+        chatHistory.push(messageData);
+        if(chatHistory.length > 50) chatHistory.shift();
         
-        // Send to everyone
-        io.emit('chat message', msg);
+        // CHANGED: Send to everyone EXCEPT the sender
+        socket.broadcast.emit('chat message', msg);
     });
 });
 
