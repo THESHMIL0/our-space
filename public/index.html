@@ -1,249 +1,108 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Our World ❤️</title>
+    <title>Our Space</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <style>
-        /* --- GLOBAL STYLES --- */
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            margin: 0; padding: 0; 
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%); 
-            height: 100vh; 
-            overflow: hidden; 
-            display: flex; flex-direction: column; align-items: center; 
-        }
-
-        /* --- CLOCK & WIDGETS --- */
-        #clock-widget { margin-top: 60px; color: white; text-align: center; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        #time { font-size: 80px; font-weight: 200; margin: 0; }
-        #date { font-size: 20px; font-weight: 400; }
-
-        /* --- HOME SCREEN ICONS --- */
-        #home-screen { display: flex; gap: 30px; margin-top: 50px; }
-        .app-icon { 
-            width: 70px; height: 70px; 
-            border-radius: 18px; 
-            display: flex; align-items: center; justify-content: center; 
-            font-size: 35px; 
-            cursor: pointer; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
-            transition: transform 0.1s;
-            position: relative;
-            background: white;
-        }
-        .app-icon:active { transform: scale(0.95); }
-        .app-label { margin-top: 8px; font-size: 12px; color: white; text-align: center; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
-
-        /* --- APP WINDOW --- */
-        .app-window { 
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 0; 
-            background: white; 
-            transition: height 0.3s cubic-bezier(0.25, 0.1, 0.25, 1); /* Smooth Slide */
-            display: flex; flex-direction: column; 
-            border-top-left-radius: 20px; border-top-right-radius: 20px; 
-            overflow: hidden; 
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
-            z-index: 10;
-        }
-        .app-header { 
-            padding: 15px; 
-            display: flex; justify-content: space-between; align-items: center; 
-            background: rgba(255,255,255,0.95); 
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid #eee; font-weight: bold; font-size: 17px;
-            z-index: 2;
-        }
-        .close-btn { color: #007aff; cursor: pointer; font-size: 16px; font-weight: normal;}
-
-        /* --- BEAUTIFUL CHAT STYLES --- */
-        #messages { 
-            list-style: none; 
-            padding: 20px; 
-            flex-grow: 1; 
-            overflow-y: auto; 
-            /* Cute Background Pattern */
-            background-color: #f5f5f7;
-            background-image: radial-gradient(#e4e4e4 1px, transparent 1px);
-            background-size: 20px 20px;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        #messages li { 
-            padding: 10px 16px; 
-            margin-bottom: 8px; 
-            border-radius: 20px; 
-            max-width: 75%; 
-            word-wrap: break-word; 
-            font-size: 16px; 
-            line-height: 1.4;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-            animation: popIn 0.3s ease-out;
-            position: relative;
-        }
-
-        /* Message Bubbles */
-        .my-msg { 
-            background: linear-gradient(135deg, #007aff, #005ecb); /* Blue Gradient */
-            color: white; 
-            align-self: flex-end; 
-            border-bottom-right-radius: 5px !important;
-        }
-        .her-msg { 
-            background: white; 
-            color: black; 
-            align-self: flex-start; 
-            border-bottom-left-radius: 5px !important;
-        }
-
-        /* Animation for new messages */
-        @keyframes popIn {
-            0% { opacity: 0; transform: translateY(10px) scale(0.9); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        /* Typing Area */
-        form { display: flex; padding: 10px 15px; background: white; border-top: 1px solid #eee; align-items: center; }
-        input { 
-            flex-grow: 1; padding: 10px 15px; border-radius: 20px; border: 1px solid #ddd; font-size: 16px; outline: none; background: #f2f2f2; 
-        }
-        button { 
-            margin-left: 10px; background: #007aff; color: white; border: none; 
-            width: 35px; height: 35px; border-radius: 50%; font-weight: bold; 
-            display: flex; align-items: center; justify-content: center;
-        }
-
-        /* --- GALLERY GRID --- */
-        #gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 2px; overflow-y: auto; }
-        #gallery-grid img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
-        .upload-btn-wrapper { padding: 15px; text-align: center; background: white; border-top: 1px solid #eee; }
-        .pretty-btn { background: #ff4081; color: white; padding: 12px; width: 100%; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; }
+        body { font-family: -apple-system, system-ui; margin: 0; background: #f0f0f5; overflow: hidden; }
+        #home-screen { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 40px 20px; text-align: center; }
+        .app-icon { width: 70px; height: 70px; border-radius: 15px; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 35px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .app-label { font-size: 13px; font-weight: 500; }
+        .app-window { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: none; flex-direction: column; z-index: 100; }
+        .app-header { padding: 15px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+        .close-btn { color: #007aff; cursor: pointer; }
+        #messages { flex: 1; overflow-y: auto; padding: 20px; background: #fff; display: flex; flex-direction: column; }
+        .bubble { max-width: 70%; padding: 10px 15px; border-radius: 20px; margin-bottom: 10px; font-size: 16px; line-height: 1.4; }
+        .me { align-self: flex-end; background: #007aff; color: white; border-bottom-right-radius: 5px; }
+        .them { align-self: flex-start; background: #e9e9eb; color: black; border-bottom-left-radius: 5px; }
+        .input-area { padding: 10px; border-top: 1px solid #ddd; display: flex; gap: 10px; }
+        #m { flex: 1; padding: 10px; border-radius: 20px; border: 1px solid #ddd; outline: none; }
+        #gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; overflow-y: auto; }
+        #gallery-grid img { width: 100%; aspect-ratio: 1; object-fit: cover; }
     </style>
 </head>
 <body>
 
-    <div id="clock-widget">
-        <h1 id="time">12:00</h1>
-        <p id="date">Monday, Feb 14</p>
-    </div>
-
     <div id="home-screen">
         <div onclick="openApp('messageApp')">
-            <div class="app-icon" style="background: linear-gradient(to bottom, #4cd964, #34a853); color: white;">💬</div>
+            <div class="app-icon" style="background: #4cd964; color: white;">💬</div>
             <div class="app-label">Messages</div>
         </div>
         <div onclick="openApp('galleryApp')">
-            <div class="app-icon" style="background: linear-gradient(to bottom right, #ffcc00, #ff9500);">🌻</div>
+            <div class="app-icon" style="background: linear-gradient(135deg, #ffcc00, #ff9500);">🌻</div>
             <div class="app-label">Gallery</div>
+        </div>
+        <div onclick="openApp('gamesApp')">
+            <div class="app-icon" style="background: #5ac8fa; color: white;">🎮</div>
+            <div class="app-label">Games</div>
         </div>
     </div>
 
     <div id="messageApp" class="app-window">
-        <div class="app-header">
-            <span>My Love ❤️</span>
-            <span class="close-btn" onclick="closeApp('messageApp')">Close</span>
+        <div class="app-header"><span>My Love ❤️</span><span class="close-btn" onclick="closeApp('messageApp')">Close</span></div>
+        <div id="messages"></div>
+        <div class="input-area">
+            <input id="m" placeholder="iMessage" autocomplete="off" />
+            <button onclick="sendMessage()" style="border:none; background:#007aff; color:white; border-radius:50%; width:35px; height:35px;">↑</button>
         </div>
-        <ul id="messages"></ul>
-        <form id="chat-form">
-            <input id="chat-input" autocomplete="off" placeholder="iMessage" />
-            <button type="submit">⬆</button>
-        </form>
     </div>
 
     <div id="galleryApp" class="app-window">
-        <div class="app-header">
-            <span>Our Memories</span>
-            <span class="close-btn" onclick="closeApp('galleryApp')">Close</span>
-        </div>
+        <div class="app-header"><span>Our Gallery</span><span class="close-btn" onclick="closeApp('galleryApp')">Close</span></div>
+        <div style="padding: 10px;"><input type="file" id="photoInput" onchange="uploadPhoto()" accept="image/*"></div>
         <div id="gallery-grid"></div>
-        <div class="upload-btn-wrapper">
-            <input type="file" id="photoInput" accept="image/*" onchange="uploadPhoto()" style="display:none">
-            <button class="pretty-btn" onclick="document.getElementById('photoInput').click()">+ Add New Memory</button>
-        </div>
+    </div>
+
+    <div id="gamesApp" class="app-window">
+        <div class="app-header"><span>Games</span><span class="close-btn" onclick="closeApp('gamesApp')">Close</span></div>
+        <div style="padding: 20px; text-align: center;"><h3>Tic-Tac-Toe Coming Soon!</h3></div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        // --- CLOCK ---
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('time').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            document.getElementById('date').innerText = now.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' });
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
-
-        // --- APP NAVIGATION ---
-        function openApp(id) { document.getElementById(id).style.height = "100%"; }
-        function closeApp(id) { document.getElementById(id).style.height = "0"; }
-
-        // --- CHAT LOGIC ---
         var socket = io();
-        var messages = document.getElementById('messages');
-        var input = document.getElementById('chat-input');
 
-        // 1. I SEND A MESSAGE
-        document.getElementById('chat-form').addEventListener('submit', function(e) {
-            e.preventDefault();
+        function openApp(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeApp(id) { document.getElementById(id).style.display = 'none'; }
+
+        function addMessage(text, type) {
+            var div = document.createElement('div');
+            div.className = 'bubble ' + type;
+            div.textContent = text;
+            document.getElementById('messages').appendChild(div);
+            document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+        }
+
+        function sendMessage() {
+            var input = document.getElementById('m');
             if (input.value) {
-                // Add to MY screen immediately (Right side, Blue)
-                addMessageToScreen(input.value, 'my-msg');
-                // Send to server (so she gets it)
-                socket.emit('chat message', input.value);
+                addMessage(input.value, 'me');
+                socket.emit('chat message', { text: input.value, sender: 'me' });
                 input.value = '';
             }
-        });
-
-        // 2. I RECEIVE A MESSAGE (From Her)
-        socket.on('chat message', function(msg) {
-            // Add to screen (Left side, White)
-            addMessageToScreen(msg, 'her-msg');
-        });
-
-        // 3. LOAD HISTORY
-        socket.on('load history', function(history) {
-            messages.innerHTML = "";
-            history.forEach(function(item) {
-                // For history, we just show them as "her" messages for now to keep it simple,
-                // or we can try to guess. Let's make them all white bubbles for history.
-                addMessageToScreen(item.text, 'her-msg');
-            });
-        });
-
-        function addMessageToScreen(text, className) {
-            var item = document.createElement('li');
-            item.textContent = text;
-            item.classList.add(className);
-            messages.appendChild(item);
-            messages.scrollTop = messages.scrollHeight;
         }
 
-        // --- PHOTO LOGIC ---
+        socket.on('chat message', function(data) { addMessage(data.text, 'them'); });
+
+        socket.on('load history', function(messages) {
+            document.getElementById('messages').innerHTML = '';
+            messages.forEach(m => addMessage(m.text, m.sender === 'me' ? 'me' : 'them'));
+        });
+
         function uploadPhoto() {
             var file = document.getElementById('photoInput').files[0];
             var formData = new FormData();
             formData.append('photo', file);
-
-            // Add to MY gallery immediately
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                addPhotoToGrid(e.target.result);
-            }
-            reader.readAsDataURL(file);
-
             fetch('/upload', { method: 'POST', body: formData });
         }
 
-        socket.on('new photo', function(filename) {
-            addPhotoToGrid('/uploads/' + filename);
-        });
-
-        function addPhotoToGrid(src) {
+        function addPhotoToGrid(url) {
             var img = document.createElement('img');
-            img.src = src;
+            img.src = url;
             document.getElementById('gallery-grid').prepend(img);
         }
+
+        socket.on('new photo', function(url) { addPhotoToGrid(url); });
     </script>
 </body>
 </html>
