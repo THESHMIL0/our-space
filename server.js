@@ -11,7 +11,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
 
-// --- CONFIGS ---
+// --- CLOUDINARY CONFIG ---
 cloudinary.config({ 
   cloud_name: 'dfve8uora', 
   api_key: '422671168247312', 
@@ -21,15 +21,24 @@ cloudinary.config({
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// --- DATABASE CONNECTION ---
 const MONGO_URI = "mongodb+srv://love:lovel23@cluster0.xjeyvxt.mongodb.net/?appName=Cluster0"; 
 mongoose.connect(MONGO_URI);
 
-const Message = mongoose.model('Message', new mongoose.Schema({ text: String, sender: String, timestamp: { type: Date, default: Date.now } }));
-const Photo = mongoose.model('Photo', new mongoose.Schema({ url: String, timestamp: { type: Date, default: Date.now } }));
+const Message = mongoose.model('Message', new mongoose.Schema({ 
+    text: String, 
+    sender: String, 
+    timestamp: { type: Date, default: Date.now } 
+}));
+
+const Photo = mongoose.model('Photo', new mongoose.Schema({ 
+    url: String, 
+    timestamp: { type: Date, default: Date.now } 
+}));
 
 const upload = multer({ storage: multer.memoryStorage() });
 
-// --- UPLOAD ---
+// --- ROUTES ---
 app.post('/upload', upload.single('photo'), async (req, res) => {
     try {
         const b64 = Buffer.from(req.file.buffer).toString("base64");
@@ -43,25 +52,24 @@ app.post('/upload', upload.single('photo'), async (req, res) => {
 });
 
 // --- REAL-TIME ENGINE ---
-let gameState = Array(9).fill(null); // Keeps track of the Tic-Tac-Toe board
+let gameState = Array(9).fill(null);
 
 io.on('connection', async (socket) => {
-    // Load Chat & Photos
     const history = await Message.find().sort({ timestamp: 1 }).limit(50);
     socket.emit('load history', history);
     const photos = await Photo.find().sort({ timestamp: -1 }).limit(20);
     photos.forEach(p => socket.emit('new photo', p.url));
-    
-    // Sync Game State
     socket.emit('game update', gameState);
 
     socket.on('chat message', async (data) => {
-        await new Message({ text: data.text, sender: 'me' }).save();
+        // Save as 'me' so history knows who sent it
+        const newMessage = new Message({ text: data.text, sender: 'me' }); 
+        await newMessage.save();
+        // Send to partner as 'them'
         socket.broadcast.emit('chat message', { text: data.text, sender: 'them' });
     });
 
     socket.on('make move', (data) => {
-        // data = { index: 0-8, symbol: 'X' or 'O' }
         gameState[data.index] = data.symbol;
         io.emit('game update', gameState);
     });
