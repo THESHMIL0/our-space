@@ -13,17 +13,12 @@
         
         #status-bar { display: flex; justify-content: space-between; padding: 12px 25px; font-weight: bold; color: rgba(0,0,0,0.7); font-size: 14px; padding-top: calc(12px + env(safe-area-inset-top)); }
         
-        #widget-area { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px 20px; }
-        .widget { background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.5); border-radius: 25px; padding: 20px; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.05); }
-        #counter-days { font-size: 40px; font-weight: 800; color: var(--primary); margin: 0; }
-        .note-input { width: 100%; height: 80px; background: transparent; border: none; outline: none; resize: none; font-family: inherit; font-size: 14px; color: #333; text-align: center; }
-
-        /* NEW: iOS Style Home Screen App Grid */
-        #home-screen { flex: 1; padding: 10px 25px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 15px; align-content: start; }
+        /* Main App Grid - No more widgets! */
+        #home-screen { flex: 1; padding: 40px 25px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px 15px; align-content: start; }
         .home-app { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
         .home-icon { width: 60px; height: 60px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 6px; transition: 0.2s; }
         .home-icon:active { transform: scale(0.9); }
-        .app-label { font-size: 11px; font-weight: 700; color: #444; text-align: center; letter-spacing: 0.2px; }
+        .app-label { font-size: 11px; font-weight: 700; color: #444; text-align: center; letter-spacing: 0.2px; text-shadow: 0 1px 3px rgba(255,255,255,0.5); }
 
         #dock { background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); margin: 10px 15px 30px 15px; border-radius: 35px; padding: 15px; display: flex; justify-content: space-around; box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
         .dock-icon { width: 60px; height: 60px; background: white; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.2s; }
@@ -40,10 +35,14 @@
         .input-area { padding: 15px; border-top: 1px solid #eee; display: flex; gap: 10px; background: white; padding-bottom: calc(30px + env(safe-area-inset-bottom)); }
         .chat-input { flex: 1; padding: 12px 20px; border-radius: 25px; border: 1px solid #eee; outline: none; background: #f1f2f6; }
         
+        /* Games Styles */
         #ttt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 250px; margin: 20px auto; }
         .cell { width: 75px; height: 75px; background: white; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 35px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.05);}
         .game-btn { display:block; margin: 15px auto; padding: 12px 25px; border-radius: 25px; border: none; background: #2f3542; color: white; font-weight: bold; font-size: 15px; cursor: pointer;}
         #draw-board { border-radius: 15px; background: white; touch-action: none; margin: 10px auto; display: block; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+
+        /* Notes App Full Screen Style */
+        .full-note-input { flex: 1; width: 100%; border: none; outline: none; resize: none; font-family: -apple-system, sans-serif; font-size: 18px; padding: 25px; background: #fffcf2; color: #333; line-height: 1.6; box-sizing: border-box; }
 
         .floating-heart { position: fixed; bottom: -50px; font-size: 50px; animation: floatUp 3s ease-in forwards; z-index: 1000; pointer-events: none; }
         @keyframes floatUp { 0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; } 100% { transform: translateY(-100vh) scale(1.5) rotate(20deg); opacity: 0; } }
@@ -56,19 +55,11 @@
         <span>5G &nbsp; 🔋 100%</span>
     </div>
 
-    <div id="widget-area">
-        <div class="widget">
-            <p style="font-size: 11px; opacity: 0.7; margin: 0 0 5px; font-weight: bold;">DAYS OF US</p>
-            <p id="counter-days">0</p>
-            <p style="font-size: 18px; margin: 5px 0 0;">❤️</p>
-        </div>
-        <div class="widget">
-            <p style="font-size: 11px; opacity: 0.7; margin: 0 0 5px; font-weight: bold;">SHARED NOTE</p>
-            <textarea id="sticky-note" class="note-input" oninput="sendNote()" placeholder="Type a note..."></textarea>
-        </div>
-    </div>
-
     <div id="home-screen">
+        <div class="home-app" onclick="openApp('notesApp')">
+            <div class="home-icon" style="background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);">📝</div>
+            <div class="app-label">Notes</div>
+        </div>
         <div class="home-app" onclick="openGameApp('ttt', 'Tic-Tac-Toe')">
             <div class="home-icon" style="background: linear-gradient(135deg, #74ebd5 0%, #9face6 100%); color: white;">❌⭕</div>
             <div class="app-label">Tic-Tac</div>
@@ -90,6 +81,11 @@
     <div id="dock">
         <div class="dock-icon" onclick="openApp('messageApp')">💬</div>
         <div class="dock-icon" onclick="triggerHeart()" style="background: var(--primary); color: white;">❤️</div>
+    </div>
+
+    <div id="notesApp" class="app-window">
+        <div class="app-header"><span>Shared Notes</span><span style="color:var(--primary); cursor:pointer;" onclick="closeApp('notesApp')">Done</span></div>
+        <textarea id="app-note" class="full-note-input" oninput="sendNote()" placeholder="Type something sweet here..."></textarea>
     </div>
 
     <div id="messageApp" class="app-window">
@@ -138,6 +134,7 @@
     <script>
         var socket = io();
         
+        // --- PHONE CLOCK ---
         function updateClock() {
             const now = new Date();
             let hours = now.getHours();
@@ -148,21 +145,15 @@
         }
         setInterval(updateClock, 1000); updateClock();
 
-        const startDate = new Date("2024-01-01"); 
-        function updateCounter() {
-            const diff = Math.floor((new Date() - startDate) / (1000 * 60 * 60 * 24));
-            document.getElementById('counter-days').innerText = diff;
-        }
-        updateCounter();
-
-        const noteBox = document.getElementById('sticky-note');
+        // --- NOTES APP SYNC ---
+        const noteBox = document.getElementById('app-note');
         function sendNote() { socket.emit('update note', noteBox.value); }
         socket.on('note update', text => { if(document.activeElement !== noteBox) noteBox.value = text; });
 
+        // --- APP NAVIGATION ---
         function openApp(id) { document.getElementById(id).style.display = 'flex'; }
         function closeApp(id) { document.getElementById(id).style.display = 'none'; }
 
-        // NEW: Function to open specific game app
         function openGameApp(gameId, title) {
             document.getElementById('game-title').innerText = title;
             ['ttt', 'draw', 'tod', 'coin'].forEach(id => { 
@@ -172,6 +163,7 @@
             openApp('gamesApp');
         }
 
+        // --- CHAT SYSTEM ---
         function addMessageToBoth(text, type) {
             const createBubble = () => { var div = document.createElement('div'); div.className = 'bubble ' + type; div.textContent = text; return div; };
             let mainChat = document.getElementById('main-chat'); mainChat.appendChild(createBubble()); mainChat.scrollTop = mainChat.scrollHeight;
@@ -183,6 +175,7 @@
         }
         socket.on('chat message', d => addMessageToBoth(d.text, 'them'));
 
+        // --- GAMES LOGIC ---
         let currentTurn = 'X'; 
         function makeMove(idx) { socket.emit('make move', { index: idx, symbol: currentTurn }); }
         socket.on('game update', state => {
@@ -196,6 +189,7 @@
         function playToD() { let msg = "🎲 " + prompts[Math.floor(Math.random() * prompts.length)]; addMessageToBoth(msg, 'me'); socket.emit('chat message', {text: msg}); }
         function flipCoin() { let msg = "🪙 I flipped a coin: **" + (Math.random() < 0.5 ? "Heads" : "Tails") + "**!"; addMessageToBoth(msg, 'me'); socket.emit('chat message', {text: msg}); }
 
+        // --- HEART BOMB ---
         function triggerHeart() { socket.emit('send heart'); }
         socket.on('show heart', () => {
             const heart = document.createElement('div'); heart.innerText = '❤️'; heart.className = 'floating-heart';
@@ -203,6 +197,7 @@
             setTimeout(() => heart.remove(), 3000);
         });
 
+        // --- DRAWING ---
         const canvas = document.getElementById('draw-board'); const ctx = canvas.getContext('2d');
         ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.strokeStyle = '#ff4757'; let drawing = false;
         function getPos(e) { const rect = canvas.getBoundingClientRect(); return { x: (e.touches ? e.touches[0].clientX : e.clientX) - rect.left, y: (e.touches ? e.touches[0].clientY : e.clientY) - rect.top }; }
