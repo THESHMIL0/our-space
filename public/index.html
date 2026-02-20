@@ -5,127 +5,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Our Space">
     <link rel="manifest" href="/manifest.json">
-    
     <title>Our Space</title>
-    
     <style>
-        :root { --primary: #ff4757; --bg: #f8f9fa; --glass: rgba(255, 255, 255, 0.9); }
-        body { font-family: -apple-system, sans-serif; margin: 0; background: var(--bg); color: #2f3542; transition: 0.3s; overflow: hidden; }
-        
-        /* Dashboard Header */
+        :root { --primary: #ff4757; --bg: #f8f9fa; }
+        body { font-family: -apple-system, sans-serif; margin: 0; background: var(--bg); overflow: hidden; }
         #dashboard-header { padding: 50px 20px 30px; text-align: center; background: white; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         #counter-days { font-size: 52px; font-weight: 800; color: var(--primary); margin: 0; }
-        #counter-label { font-size: 14px; text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; margin-top: 5px; }
-
-        /* Home Icons */
         #home-screen { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 40px 20px; }
-        .app-card { background: white; padding: 25px 10px; border-radius: 24px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: 0.2s; cursor: pointer; }
-        .app-card:active { transform: scale(0.9); opacity: 0.7; }
-        .app-icon { font-size: 35px; margin-bottom: 10px; display: block; }
-        .app-label { font-size: 12px; font-weight: 600; }
-
-        /* App Windows */
-        .app-window { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: none; flex-direction: column; z-index: 100; animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        
+        .app-card { background: white; padding: 25px 10px; border-radius: 24px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .app-window { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: none; flex-direction: column; z-index: 100; }
         .app-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; font-weight: bold; }
-        .close-btn { color: var(--primary); font-size: 14px; cursor: pointer; font-weight: 600; }
-
-        /* Chat UI */
-        #messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; background: #fff; }
-        .bubble { max-width: 75%; padding: 12px 16px; border-radius: 20px; font-size: 15px; position: relative; line-height: 1.4; }
+        #messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .bubble { max-width: 75%; padding: 12px 16px; border-radius: 20px; font-size: 15px; }
         .me { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 4px; }
         .them { align-self: flex-start; background: #e9e9eb; color: black; border-bottom-left-radius: 4px; }
-
-        /* Input Area */
         .input-area { padding: 15px; border-top: 1px solid #eee; display: flex; gap: 10px; background: white; padding-bottom: 30px; }
-        #m { flex: 1; padding: 12px 18px; border-radius: 25px; border: 1px solid #eee; outline: none; background: #f1f2f6; font-size: 16px; }
-
-        /* Tic Tac Toe */
-        #ttt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 300px; margin: 40px auto; }
-        .cell { width: 90px; height: 90px; background: #f1f2f6; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: bold; transition: 0.1s; }
-        .cell:active { background: #dfe4ea; }
-
-        /* Gallery */
-        #gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; overflow-y: auto; flex: 1; }
+        #m { flex: 1; padding: 12px; border-radius: 25px; border: 1px solid #eee; outline: none; background: #f1f2f6; }
+        #ttt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 280px; margin: 40px auto; }
+        .cell { width: 85px; height: 85px; background: #f1f2f6; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: bold; }
+        #gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; overflow-y: auto; }
         #gallery-grid img { width: 100%; aspect-ratio: 1; object-fit: cover; }
     </style>
 </head>
 <body>
-
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js');
-        }
-    </script>
+    <script>if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/sw.js'); }</script>
 
     <div id="dashboard-header">
         <p id="counter-days">0</p>
-        <p id="counter-label">Days of Love ❤️</p>
+        <p style="opacity:0.6; font-size:14px; margin:0;">DAYS OF US ❤️</p>
     </div>
 
     <div id="home-screen">
-        <div class="app-card" onclick="openApp('messageApp')">
-            <span class="app-icon">💬</span>
-            <span class="app-label">Chat</span>
-        </div>
-        <div class="app-card" onclick="openApp('galleryApp')">
-            <span class="app-icon">🌻</span>
-            <span class="app-label">Gallery</span>
-        </div>
-        <div class="app-card" onclick="openApp('gamesApp')">
-            <span class="app-icon">🎮</span>
-            <span class="app-label">Games</span>
-        </div>
+        <div class="app-card" onclick="openApp('messageApp')"><span style="font-size:35px;">💬</span><br><span style="font-size:12px; font-weight:600;">Chat</span></div>
+        <div class="app-card" onclick="openApp('galleryApp')"><span style="font-size:35px;">🌻</span><br><span style="font-size:12px; font-weight:600;">Gallery</span></div>
+        <div class="app-card" onclick="openApp('gamesApp')"><span style="font-size:35px;">🎮</span><br><span style="font-size:12px; font-weight:600;">Games</span></div>
     </div>
 
     <div id="messageApp" class="app-window">
-        <div class="app-header"><span>My Love</span><span class="close-btn" onclick="closeApp('messageApp')">Close</span></div>
+        <div class="app-header"><span>Messages</span><span style="color:var(--primary)" onclick="closeApp('messageApp')">Close</span></div>
         <div id="messages"></div>
         <div class="input-area">
             <input id="m" placeholder="iMessage" autocomplete="off" />
-            <button onclick="sendMessage()" style="background:var(--primary); color:white; border:none; border-radius:50%; width:40px; height:40px; font-size: 20px; font-weight: bold;">↑</button>
+            <button onclick="sendMessage()" style="background:var(--primary); color:white; border:none; border-radius:50%; width:40px; height:40px;">↑</button>
         </div>
     </div>
 
     <div id="galleryApp" class="app-window">
-        <div class="app-header"><span>Our Memories</span><span class="close-btn" onclick="closeApp('galleryApp')">Close</span></div>
-        <div style="padding: 15px; border-bottom: 1px solid #eee;">
-            <input type="file" id="pInput" onchange="upload()" accept="image/*" style="font-size: 14px;">
-        </div>
+        <div class="app-header"><span>Gallery</span><span style="color:var(--primary)" onclick="closeApp('galleryApp')">Close</span></div>
+        <input type="file" id="pInput" onchange="upload()" style="padding:20px;">
         <div id="gallery-grid"></div>
     </div>
 
     <div id="gamesApp" class="app-window">
-        <div class="app-header"><span>Tic-Tac-Toe</span><span class="close-btn" onclick="closeApp('gamesApp')">Quit</span></div>
+        <div class="app-header"><span>Tic-Tac-Toe</span><span style="color:var(--primary)" onclick="closeApp('gamesApp')">Quit</span></div>
         <div id="ttt-grid">
             <div class="cell" onclick="makeMove(0)"></div><div class="cell" onclick="makeMove(1)"></div><div class="cell" onclick="makeMove(2)"></div>
             <div class="cell" onclick="makeMove(3)"></div><div class="cell" onclick="makeMove(4)"></div><div class="cell" onclick="makeMove(5)"></div>
             <div class="cell" onclick="makeMove(6)"></div><div class="cell" onclick="makeMove(7)"></div><div class="cell" onclick="makeMove(8)"></div>
         </div>
-        <button onclick="resetGame()" style="display:block; margin: 0 auto; padding: 12px 30px; border-radius: 25px; border: none; background: #2f3542; color: white; font-weight: 600;">Restart Game</button>
+        <button onclick="resetGame()" style="display:block; margin:0 auto; padding:10px 20px; border-radius:20px; border:none; background:#2f3542; color:white;">Restart</button>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         var socket = io();
-        
-        // RELATIONSHIP COUNTER (Update your date here!)
-        const startDate = new Date("2024-01-01"); 
+        const startDate = new Date("2024-01-01"); // UPDATE THIS!
         function updateCounter() {
-            const now = new Date();
-            const diff = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
+            const diff = Math.floor((new Date() - startDate) / (1000 * 60 * 60 * 24));
             document.getElementById('counter-days').innerText = diff;
         }
         updateCounter();
 
-        // APP NAVIGATION
         function openApp(id) { document.getElementById(id).style.display = 'flex'; }
         function closeApp(id) { document.getElementById(id).style.display = 'none'; }
 
-        // CHAT LOGIC (Handles identity correctly)
         function addMessage(text, type) {
             var div = document.createElement('div');
             div.className = 'bubble ' + type;
@@ -137,46 +91,31 @@
         function sendMessage() {
             var i = document.getElementById('m');
             if(i.value) {
-                addMessage(i.value, 'me'); // Local display
-                socket.emit('chat message', {text: i.value}); // Send to server
+                addMessage(i.value, 'me');
+                socket.emit('chat message', {text: i.value});
                 i.value = '';
             }
         }
 
         socket.on('chat message', d => addMessage(d.text, 'them'));
-        
         socket.on('load history', h => {
             document.getElementById('messages').innerHTML = '';
             h.forEach(m => addMessage(m.text, m.sender === 'me' ? 'me' : 'them'));
         });
 
-        // TIC-TAC-TOE LOGIC
-        let mySymbol = 'X'; 
-        function makeMove(idx) {
-            socket.emit('make move', { index: idx, symbol: mySymbol });
-        }
-
+        function makeMove(idx) { socket.emit('make move', { index: idx, symbol: 'X' }); }
         socket.on('game update', state => {
             const cells = document.querySelectorAll('.cell');
-            state.forEach((val, i) => {
-                cells[i].innerText = val || '';
-                cells[i].style.color = val === 'X' ? '#ff4757' : '#2ed573';
-            });
+            state.forEach((val, i) => { cells[i].innerText = val || ''; });
         });
-
         function resetGame() { socket.emit('reset game'); }
 
-        // GALLERY LOGIC (Permanent Cloudinary storage)
         function upload() {
-            var f = document.getElementById('pInput').files[0];
-            if(!f) return;
-            var d = new FormData(); d.append('photo', f);
+            var d = new FormData(); d.append('photo', document.getElementById('pInput').files[0]);
             fetch('/upload', { method: 'POST', body: d });
         }
-
         socket.on('new photo', url => {
-            var img = document.createElement('img');
-            img.src = url;
+            var img = document.createElement('img'); img.src = url;
             document.getElementById('gallery-grid').prepend(img);
         });
     </script>
