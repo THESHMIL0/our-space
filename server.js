@@ -11,23 +11,32 @@ const io = new Server(server, { cors: { origin: "*" }, maxHttpBufferSize: 1e8 })
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Memory Storage
+// Premium Memory Storage
 let gameState = Array(9).fill(null);
 let sharedNote = ""; 
 let bucketList = ["Go to the beach 🏖️", "Late night drive 🚗"]; 
-let partnerMood = "Happy 😊"; // NEW: Mood Memory
+let partnerMood = "Happy 😊"; 
+let locketImage = ""; // NEW: Home Screen Locket Memory
 
 io.on('connection', (socket) => {
-    // Send states on load
+    // Sync all states on load
     socket.emit('game update', gameState);
     socket.emit('note update', sharedNote);
     socket.emit('list update', bucketList);
     socket.emit('mood update', partnerMood);
+    socket.emit('locket update', locketImage);
 
-    // 💬 Chat (Now triggers notifications)
+    // 💬 Chat
     socket.on('chat message', (data) => {
         socket.broadcast.emit('chat message', { text: data.text, sender: 'them' });
-        socket.broadcast.emit('notification', `💬 New Message: ${data.text}`);
+        socket.broadcast.emit('notification', `💬 ${data.text}`);
+    });
+
+    // 🖼️ Locket Widget
+    socket.on('update locket', (imgData) => {
+        locketImage = imgData;
+        io.emit('locket update', locketImage);
+        socket.broadcast.emit('notification', `🖼️ Updated the Locket!`);
     });
 
     // 🎮 Tic-Tac-Toe
@@ -40,19 +49,15 @@ io.on('connection', (socket) => {
     // ❤️ Floating Hearts
     socket.on('send heart', () => {
         io.emit('show heart');
-        socket.broadcast.emit('notification', `❤️ Sending you love!`);
+        socket.broadcast.emit('notification', `❤️ Sent you love!`);
     });
 
     // 📝 Sticky Note
-    socket.on('update note', (text) => { 
-        sharedNote = text; 
-        socket.broadcast.emit('note update', sharedNote); 
-    });
+    socket.on('update note', (text) => { sharedNote = text; socket.broadcast.emit('note update', sharedNote); });
 
     // ✅ Bucket List
     socket.on('add item', (item) => { 
-        bucketList.push(item); 
-        io.emit('list update', bucketList); 
+        bucketList.push(item); io.emit('list update', bucketList); 
         socket.broadcast.emit('notification', `✅ Added to Bucket List!`);
     });
     socket.on('clear list', () => { bucketList = []; io.emit('list update', bucketList); });
@@ -60,14 +65,13 @@ io.on('connection', (socket) => {
     // 📸 Secret Snap Camera
     socket.on('send snap', (imgData) => {
         socket.broadcast.emit('receive snap', imgData);
-        socket.broadcast.emit('notification', `📸 Sent you a Secret Snap!`);
+        socket.broadcast.emit('notification', `📸 Sent a Secret Snap!`);
     });
 
     // 🎭 Mood Tracker
     socket.on('set mood', (mood) => {
-        partnerMood = mood;
-        io.emit('mood update', partnerMood);
-        socket.broadcast.emit('notification', `🎭 Mood changed to: ${mood}`);
+        partnerMood = mood; io.emit('mood update', partnerMood);
+        socket.broadcast.emit('notification', `🎭 Mood: ${mood}`);
     });
 });
 
