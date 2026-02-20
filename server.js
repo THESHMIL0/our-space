@@ -11,7 +11,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
 
-// --- CLOUDINARY CONFIG (Forever Photos) ---
+// --- CONFIGS ---
 cloudinary.config({ 
   cloud_name: 'dfve8uora', 
   api_key: '422671168247312', 
@@ -21,57 +21,55 @@ cloudinary.config({
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// --- DATABASE CONNECTION (Forever Chat) ---
 const MONGO_URI = "mongodb+srv://love:lovel23@cluster0.xjeyvxt.mongodb.net/?appName=Cluster0"; 
 mongoose.connect(MONGO_URI);
 
-const Message = mongoose.model('Message', new mongoose.Schema({ 
-    text: String, 
-    sender: String, 
-    timestamp: { type: Date, default: Date.now } 
-}));
+const Message = mongoose.model('Message', new mongoose.Schema({ text: String, sender: String, timestamp: { type: Date, default: Date.now } }));
+const Photo = mongoose.model('Photo', new mongoose.Schema({ url: String, timestamp: { type: Date, default: Date.now } }));
 
-const Photo = mongoose.model('Photo', new mongoose.Schema({ 
-    url: String, 
-    timestamp: { type: Date, default: Date.now } 
-}));
+const upload = multer({ storage: multer.memoryStorage() });
 
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
-
-// --- PERMANENT UPLOAD ROUTE ---
+// --- UPLOAD ---
 app.post('/upload', upload.single('photo'), async (req, res) => {
     try {
-        if(!req.file) return res.status(400).send('No file.');
         const b64 = Buffer.from(req.file.buffer).toString("base64");
         let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
         const result = await cloudinary.uploader.upload(dataURI, { resource_type: "auto" });
-        
         const newPhoto = new Photo({ url: result.secure_url });
         await newPhoto.save();
-        
         io.emit('new photo', result.secure_url);
         res.json({ success: true });
-    } catch (e) { res.status(500).send('Upload Error'); }
+    } catch (e) { res.status(500).send(e); }
 });
 
-// --- REAL-TIME CHAT LOGIC ---
+// --- REAL-TIME ENGINE ---
+let gameState = Array(9).fill(null); // Keeps track of the Tic-Tac-Toe board
+
 io.on('connection', async (socket) => {
-    // Load history and tell client who sent what
+    // Load Chat & Photos
     const history = await Message.find().sort({ timestamp: 1 }).limit(50);
     socket.emit('load history', history);
-    
     const photos = await Photo.find().sort({ timestamp: -1 }).limit(20);
     photos.forEach(p => socket.emit('new photo', p.url));
+    
+    // Sync Game State
+    socket.emit('game update', gameState);
 
     socket.on('chat message', async (data) => {
-        // Save text AND sender identity
-        const newMessage = new Message({ text: data.text, sender: 'me' }); 
-        await newMessage.save();
-        // Broadcast to the other person
+        await new Message({ text: data.text, sender: 'me' }).save();
         socket.broadcast.emit('chat message', { text: data.text, sender: 'them' });
+    });
+
+    socket.on('make move', (data) => {
+        // data = { index: 0-8, symbol: 'X' or 'O' }
+        gameState[data.index] = data.symbol;
+        io.emit('game update', gameState);
+    });
+
+    socket.on('reset game', () => {
+        gameState = Array(9).fill(null);
+        io.emit('game update', gameState);
     });
 });
 
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`Server live on port ${PORT}`));
+server.listen(process.env.PORT || 3000);
