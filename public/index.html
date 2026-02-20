@@ -11,6 +11,10 @@
         :root { --primary: #ff4757; --ios-blue: #007aff; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%); overflow: hidden; color: #333; height: 100vh; height: 100dvh; display: flex; flex-direction: column; padding-bottom: env(safe-area-inset-bottom); transition: transform 0.1s; }
         
+        /* 🌙 SLEEP MODE OVERLAY */
+        #sleep-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 10, 30, 0.6); backdrop-filter: brightness(0.7) blur(2px); z-index: 99998; pointer-events: none; display: none; opacity: 0; transition: opacity 2s ease-in-out; }
+        .sleeping #sleep-overlay { display: block; opacity: 1; }
+
         @keyframes shake { 0% { transform: translate(2px, 2px) rotate(0deg); } 10% { transform: translate(-2px, -3px) rotate(-1deg); } 20% { transform: translate(-4px, 0px) rotate(1deg); } 30% { transform: translate(4px, 3px) rotate(0deg); } 40% { transform: translate(2px, -2px) rotate(1deg); } 50% { transform: translate(-2px, 3px) rotate(-1deg); } 60% { transform: translate(-4px, 2px) rotate(0deg); } 70% { transform: translate(4px, 2px) rotate(-1deg); } 80% { transform: translate(-2px, -2px) rotate(1deg); } 90% { transform: translate(2px, 3px) rotate(0deg); } 100% { transform: translate(2px, -3px) rotate(-1deg); } }
         .shake-screen { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
         .shake-element { animation: shake 0.5s infinite; }
@@ -18,17 +22,14 @@
         @keyframes fastSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(1080deg); } }
         .spinning { animation: fastSpin 2s cubic-bezier(0.2, 0.8, 0.2, 1); }
 
-        /* MUSIC EQUALIZER ANIMATION */
         .equalizer { display: inline-flex; align-items: flex-end; gap: 3px; height: 14px; margin-right: 8px; }
         .eq-bar { width: 3px; background-color: #1db954; border-radius: 2px; animation: bounceBar 1s infinite ease-in-out alternate; }
-        .eq-bar:nth-child(1) { height: 6px; animation-delay: 0.1s; }
-        .eq-bar:nth-child(2) { height: 14px; animation-delay: 0.3s; }
-        .eq-bar:nth-child(3) { height: 8px; animation-delay: 0.5s; }
+        .eq-bar:nth-child(1) { height: 6px; animation-delay: 0.1s; } .eq-bar:nth-child(2) { height: 14px; animation-delay: 0.3s; } .eq-bar:nth-child(3) { height: 8px; animation-delay: 0.5s; }
         @keyframes bounceBar { 0% { height: 4px; } 100% { height: 14px; } }
 
-        /* PLANT PROGRESS BAR */
         .progress-bg { width: 80%; height: 12px; background: #e0e0e0; border-radius: 10px; margin: 15px auto; overflow: hidden; box-shadow: inset 0 2px 5px rgba(0,0,0,0.1); }
         .progress-fill { height: 100%; background: linear-gradient(90deg, #d4fc79 0%, #96e6a1 100%); width: 0%; transition: width 0.5s ease; }
+        .love-fill { height: 100%; background: linear-gradient(90deg, #ff0844 0%, #ffb199 100%); width: 100%; transition: width 0.5s ease; }
 
         #dynamic-island { position: fixed; top: max(12px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); width: 130px; height: 35px; background: black; border-radius: 30px; z-index: 100000; transition: 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: 600; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3); pointer-events: none; }
         .island-active { width: 90%; height: 65px; justify-content: flex-start; padding: 0 20px; box-sizing: border-box; }
@@ -37,24 +38,24 @@
 
         #status-bar { display: flex; justify-content: space-between; padding: 15px 30px; font-weight: 600; color: rgba(0,0,0,0.6); font-size: 13px; padding-top: calc(15px + env(safe-area-inset-top)); }
         
-        .locket-widget { grid-column: span 4; height: 160px; background: rgba(255,255,255,0.3); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.4); border-radius: 35px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.08); margin-bottom: 5px; cursor: pointer; flex-direction: column; color: rgba(0,0,0,0.5); font-weight: bold; font-size: 14px; }
+        .locket-widget { grid-column: span 4; height: 140px; background: rgba(255,255,255,0.3); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.4); border-radius: 35px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.08); margin-bottom: 0px; cursor: pointer; flex-direction: column; color: rgba(0,0,0,0.5); font-weight: bold; font-size: 14px; }
         .locket-widget img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; display: none; z-index: 2; transition: opacity 0.3s; }
         .locket-widget:active { transform: scale(0.97); }
 
-        #home-screen { flex: 1; padding: 10px 25px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 15px; align-content: start; }
+        #home-screen { flex: 1; padding: 10px 25px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px 12px; align-content: start; overflow-y: auto; }
         .home-app { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .home-icon { width: 60px; height: 60px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 6px 20px rgba(0,0,0,0.12); margin-bottom: 6px; transition: 0.2s; position: relative; overflow: hidden; }
+        .home-icon { width: 55px; height: 55px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 6px 20px rgba(0,0,0,0.12); margin-bottom: 6px; transition: 0.2s; position: relative; overflow: hidden; }
         .home-icon:active { transform: scale(0.9); filter: brightness(0.8); }
-        .app-label { font-size: 11px; font-weight: 600; color: #444; text-align: center; letter-spacing: 0.3px; text-shadow: 0 1px 5px rgba(255,255,255,0.6); }
+        .app-label { font-size: 11px; font-weight: 600; color: #444; text-align: center; letter-spacing: 0.2px; text-shadow: 0 1px 5px rgba(255,255,255,0.6); white-space: nowrap; }
 
-        #dock { background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); margin: 10px 20px 30px 20px; border-radius: 40px; padding: 15px; display: flex; justify-content: space-around; box-shadow: 0 10px 40px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.5); }
+        #dock { background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); margin: 5px 20px 20px 20px; border-radius: 40px; padding: 15px; display: flex; justify-content: space-around; box-shadow: 0 10px 40px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.5); }
         .dock-icon { width: 60px; height: 60px; background: white; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 32px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: 0.2s; }
         .dock-icon:active { transform: scale(0.9); }
         
         .app-window { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f2f2f7; display: none; flex-direction: column; z-index: 100; animation: slideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
         @keyframes slideUp { from { transform: translateY(100%); border-radius: 40px; } to { transform: translateY(0); border-radius: 0; } }
         .app-header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.7); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-bottom: 1px solid rgba(0,0,0,0.1); font-weight: 600; font-size: 17px; padding-top: calc(15px + env(safe-area-inset-top)); z-index: 10; position: relative; }
-        .app-title { position: absolute; left: 50%; transform: translateX(-50%); font-weight: 600; color: #000; }
+        .app-title { position: absolute; left: 50%; transform: translateX(-50%); font-weight: 600; color: #000; white-space: nowrap; }
         .done-btn { color: var(--ios-blue); cursor: pointer; font-size: 17px; font-weight: 500; z-index: 2; }
         
         .chat-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
@@ -71,8 +72,10 @@
 
         .input-area { padding: 15px; border-top: 1px solid #ccc; display: flex; gap: 10px; background: #f8f9fa; padding-bottom: calc(30px + env(safe-area-inset-bottom)); }
         .chat-input { flex: 1; padding: 12px 20px; border-radius: 25px; border: 1px solid #ddd; outline: none; background: #fff; font-size: 16px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.02); }
+        
+        .list-item { background: #f8f9fa; padding: 15px 20px; border-radius: 18px; margin-bottom: 12px; font-weight: 500; font-size: 16px; display: flex; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+        .list-item::before { content: '✨'; margin-right: 12px; font-size: 20px; }
 
-        #ttt-status { font-size: 22px; font-weight: 800; color: #333; margin: 15px 0 5px 0; transition: 0.3s; }
         #ttt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 280px; margin: 15px auto 30px auto; }
         .cell { width: 85px; height: 85px; background: white; border-radius: 22px; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: 0.2s;}
         .cell:active { transform: scale(0.95); }
@@ -82,17 +85,15 @@
         .game-btn:active { transform: scale(0.95); }
         
         #draw-board { border-radius: 20px; background: white; touch-action: none; margin: 10px auto; display: block; box-shadow: 0 5px 20px rgba(0,0,0,0.06); }
-        .draw-tools { display: flex; justify-content: center; align-items: center; gap: 12px; margin-bottom: 15px; }
         .color-btn { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 3px solid transparent; transition: 0.2s; }
         .color-btn:active { transform: scale(0.9); }
-        .eraser-btn { padding: 8px 15px; border-radius: 20px; background: white; border: 1px solid #ccc; font-weight: bold; font-size: 14px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 
         .floating-heart { position: fixed; bottom: -50px; font-size: 50px; animation: floatUp 3s ease-in forwards; z-index: 1000; pointer-events: none; text-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         @keyframes floatUp { 0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; } 100% { transform: translateY(-100vh) scale(1.5) rotate(20deg); opacity: 0; } }
     </style>
 </head>
 <body>
-    <div id="dynamic-island"><span id="island-text">Notification</span></div>
+    <div id="sleep-overlay"></div> <div id="dynamic-island"><span id="island-text">Notification</span></div>
 
     <div id="status-bar">
         <span id="clock">12:00</span>
@@ -105,13 +106,12 @@
         </span>
     </div>
 
-    <div style="text-align:center; padding: 5px 0 15px 0; font-weight:600; color:white; font-size: 14px; text-shadow:0 1px 5px rgba(0,0,0,0.3); opacity: 0.9;">
-        <span>Mood: <span id="partner-mood-display">😊</span></span> <span style="margin: 0 5px;">|</span>
-        <span>Batt: <span id="partner-battery-display">100% 🔋</span></span> <span style="margin: 0 5px;">|</span>
-        <span style="display:inline-flex; align-items:center;">
-            <div id="music-eq" class="equalizer" style="display:none;">
-                <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
-            </div>
+    <div style="text-align:center; padding: 5px 0 10px 0; font-weight:600; color:white; font-size: 13px; text-shadow:0 1px 5px rgba(0,0,0,0.3); opacity: 0.9;">
+        <span>Mood: <span id="partner-mood-display">😊</span></span> <span style="margin: 0 3px;">|</span>
+        <span>Batt: <span id="partner-battery-display">100% 🔋</span></span> <span style="margin: 0 3px;">|</span>
+        <span>Love: <span id="partner-love-display">100% 💖</span></span> <br>
+        <span style="display:inline-flex; align-items:center; margin-top: 5px;">
+            <div id="music-eq" class="equalizer" style="display:none;"><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div></div>
             <span id="music-display">Silence 🤫</span>
         </span>
     </div>
@@ -128,6 +128,11 @@
         <div class="home-app" onclick="openApp('dateApp')"><div class="home-icon" style="background: linear-gradient(135deg, #ff0844 0%, #ffb199 100%); color:white;">🍿</div><div class="app-label">Date Night</div></div>
         <div class="home-app" onclick="openApp('countApp')"><div class="home-icon" style="background: linear-gradient(135deg, #fccb90 0%, #d57eeb 100%); color:white;">⏳</div><div class="app-label">Timer</div></div>
         
+        <div class="home-app" onclick="openApp('watchApp')"><div class="home-icon" style="background: linear-gradient(135deg, #000000 0%, #e50914 100%); color:white;">🎬</div><div class="app-label">Watchlist</div></div>
+        <div class="home-app" onclick="openApp('wyrApp')"><div class="home-icon" style="background: linear-gradient(135deg, #f83600 0%, #f9d423 100%); color:white;">🤔</div><div class="app-label">Questions</div></div>
+        <div class="home-app" onclick="openApp('loveApp')"><div class="home-icon" style="background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%); color:white;">💖</div><div class="app-label">Love Meter</div></div>
+        <div class="home-app" onclick="openApp('sleepApp')"><div class="home-icon" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); color:white;">🌙</div><div class="app-label">Sleep Sync</div></div>
+
         <div class="home-app" onclick="openApp('magicApp')"><div class="home-icon" style="background: linear-gradient(135deg, #434343 0%, #000000 100%); color:white;">🎱</div><div class="app-label">8-Ball</div></div>
         <div class="home-app" onclick="openApp('moodApp')"><div class="home-icon" style="background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);">🎭</div><div class="app-label">Mood</div></div>
         <div class="home-app" onclick="openGameApp('ttt', 'Tic-Tac-Toe')"><div class="home-icon" style="background: linear-gradient(135deg, #74ebd5 0%, #9face6 100%); color: white;">❌⭕</div><div class="app-label">Tic-Tac</div></div>
@@ -140,82 +145,58 @@
         <div class="dock-icon" onclick="triggerHeart()" style="background: var(--primary); color: white;">❤️</div>
     </div>
 
-    <div id="musicApp" class="app-window">
-        <div class="app-header"><div style="width:40px;"></div><span class="app-title">Music Sync</span><span class="done-btn" onclick="closeApp('musicApp')">Done</span></div>
-        <div style="padding: 30px; text-align: center;">
-            <div style="font-size: 70px; margin-bottom: 20px;">🎧</div>
-            <h3 style="color:#333;">What are you listening to?</h3>
-            <input id="song-input" class="chat-input" placeholder="e.g., Taylor Swift - Lover" style="width:90%; margin:20px 0; text-align: center;">
-            <button class="game-btn" style="background:#1db954;" onclick="setMusic()">Sync Status</button>
-            <button class="game-btn" style="background:#ccc; color:#333;" onclick="clearMusic()">Clear Music</button>
-        </div>
+    <div id="watchApp" class="app-window">
+        <div class="app-header"><div style="width:40px;"></div><span class="app-title">Movie Watchlist</span><span class="done-btn" onclick="closeApp('watchApp')">Done</span></div>
+        <div id="watchlist-container" style="flex: 1; padding: 20px; overflow-y: auto; background: white;"></div>
+        <div class="input-area"><input id="watch-input" class="chat-input" placeholder="Movie or Show name..." autocomplete="off" /><button onclick="addMovie()" style="background:#e50914; color:white; border:none; border-radius:50%; width:40px; height:40px; font-size:20px;">+</button></div>
+        <button class="game-btn" style="background: #333; width: 90%; margin-bottom: 30px;" onclick="clearMovies()">Clear List</button>
     </div>
 
-    <div id="plantApp" class="app-window">
-        <div class="app-header"><div style="width:40px;"></div><span class="app-title">Our Plant</span><span class="done-btn" onclick="closeApp('plantApp')">Done</span></div>
+    <div id="wyrApp" class="app-window">
+        <div class="app-header"><div style="width:40px;"></div><span class="app-title">Would You Rather?</span><span class="done-btn" onclick="closeApp('wyrApp')">Done</span></div>
         <div style="padding: 40px 20px; text-align: center;">
-            <div id="plant-emoji" style="font-size: 110px; margin-bottom: 10px; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">🌱</div>
-            <h2 style="color:#2ed573; margin-bottom: 5px;">Level: <span id="plant-level-text">0</span></h2>
-            
-            <div class="progress-bg"><div id="plant-progress" class="progress-fill"></div></div>
-            <p style="color:#888; font-size: 13px; margin-top:0;">Next evolution at level <span id="next-evo">10</span>!</p>
-            
-            <button class="game-btn" style="background:#1e90ff; font-size:20px; padding: 20px 40px; margin-top: 30px; box-shadow: 0 10px 20px rgba(30, 144, 255, 0.3);" onclick="waterPlant()">Water 💧</button>
+            <div style="font-size: 80px; margin-bottom: 20px;">🤔</div>
+            <h3 style="color:#333; margin: 20px 0;">Generate a deep question!</h3>
+            <p style="color:#666; font-size: 14px; margin-bottom: 30px;">Sends directly to the chat room to discuss.</p>
+            <button class="game-btn" style="background:#f83600; font-size:18px; padding: 18px 40px;" onclick="generateWYR()">Ask a Question</button>
         </div>
     </div>
 
-    <div id="dateApp" class="app-window">
-        <div class="app-header"><div style="width:40px;"></div><span class="app-title">Date Roulette</span><span class="done-btn" onclick="closeApp('dateApp')">Done</span></div>
+    <div id="loveApp" class="app-window">
+        <div class="app-header"><div style="width:40px;"></div><span class="app-title">Love Meter</span><span class="done-btn" onclick="closeApp('loveApp')">Done</span></div>
         <div style="padding: 40px 20px; text-align: center;">
-            <div id="roulette-emoji" style="font-size: 80px; margin-bottom: 20px; display:inline-block;">🎲</div>
-            <h3 style="color:#333; margin: 20px 0;">Can't decide on date night?</h3>
-            <p style="color:#666; font-size: 14px; margin-bottom: 30px;">We'll randomly pick dinner & activity!</p>
-            <button class="game-btn" style="background:#ff4757; font-size:18px; padding: 18px 40px;" onclick="spinDate()">Spin the Wheel!</button>
+            <div id="love-heart" style="font-size: 100px; margin-bottom: 10px; transition: 0.2s;">💖</div>
+            <h2 style="color:#ff4757; margin-bottom: 5px;">Love Level: <span id="love-level-text">100</span>%</h2>
+            <div class="progress-bg"><div id="love-progress" class="love-fill"></div></div>
+            <p style="color:#888; font-size: 14px; margin-top:20px;">Tap the heart rapidly to send love and keep the battery at 100%!</p>
+            <button class="game-btn" style="background:#ff7eb3; font-size:20px; padding: 20px 50px; margin-top: 20px;" onclick="chargeLove()">Charge! ⚡</button>
         </div>
     </div>
 
-    <div id="countApp" class="app-window">
-        <div class="app-header"><div style="width:40px;"></div><span class="app-title">Countdown</span><span class="done-btn" onclick="closeApp('countApp')">Done</span></div>
-        <div style="padding: 30px 20px; text-align: center;">
-            
-            <div style="background: white; border-radius: 30px; padding: 40px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 30px;">
-                <h1 id="countdown-display" style="font-size: 70px; color: var(--ios-blue); margin:0; font-weight: 800; letter-spacing: -2px;">0</h1>
-                <h3 style="color:#888; margin-top:5px; text-transform: uppercase; font-size: 14px; letter-spacing: 2px;">Days Left</h3>
-            </div>
-            
-            <p style="font-weight: bold; color: #555;">Set Target Date:</p>
-            <input type="date" id="date-input" class="chat-input" style="width:80%; margin:10px 0 20px 0; text-align: center;">
-            <button class="game-btn" onclick="setCountdown()">Start Countdown</button>
-        </div>
-    </div>
-
-    <div id="magicApp" class="app-window">
-        <div class="app-header"><div style="width:40px;"></div><span class="app-title">Magic 8-Ball</span><span class="done-btn" onclick="closeApp('magicApp')">Done</span></div>
+    <div id="sleepApp" class="app-window">
+        <div class="app-header"><div style="width:40px;"></div><span class="app-title">Sleep Sync</span><span class="done-btn" onclick="closeApp('sleepApp')">Done</span></div>
         <div style="padding: 40px 20px; text-align: center;">
-            <div id="eightball-emoji" style="font-size: 90px; margin-bottom: 30px; display: inline-block;">🎱</div>
-            <input id="eightball-input" class="chat-input" placeholder="Ask a yes/no question..." style="width:90%; margin-bottom: 30px; text-align: center;">
-            <button class="game-btn" style="background: #2c3e50; padding: 18px 50px; font-size: 18px;" onclick="shake8Ball()">Shake & Reveal</button>
+            <div style="font-size: 100px; margin-bottom: 20px;">😴</div>
+            <h2 style="color:#333; margin-bottom: 5px;">Going to bed?</h2>
+            <p style="color:#666; font-size: 14px; margin-bottom: 30px;">Activate Zen Mode. This will darken her screen and show her you are sleeping!</p>
+            <button id="sleep-btn" class="game-btn" style="background:#330867; font-size:18px; padding: 18px 40px;" onclick="toggleSleep()">Go to Sleep 🌙</button>
         </div>
     </div>
 
+    <div id="musicApp" class="app-window"><div class="app-header"><div style="width:40px;"></div><span class="app-title">Music Sync</span><span class="done-btn" onclick="closeApp('musicApp')">Done</span></div><div style="padding: 30px; text-align: center;"><div style="font-size: 70px; margin-bottom: 20px;">🎧</div><h3 style="color:#333;">What are you listening to?</h3><input id="song-input" class="chat-input" placeholder="e.g., Taylor Swift - Lover" style="width:90%; margin:20px 0; text-align: center;"><button class="game-btn" style="background:#1db954;" onclick="setMusic()">Sync Status</button><button class="game-btn" style="background:#ccc; color:#333;" onclick="clearMusic()">Clear Music</button></div></div>
+    <div id="plantApp" class="app-window"><div class="app-header"><div style="width:40px;"></div><span class="app-title">Our Plant</span><span class="done-btn" onclick="closeApp('plantApp')">Done</span></div><div style="padding: 40px 20px; text-align: center;"><div id="plant-emoji" style="font-size: 110px; margin-bottom: 10px; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">🌱</div><h2 style="color:#2ed573; margin-bottom: 5px;">Level: <span id="plant-level-text">0</span></h2><div class="progress-bg"><div id="plant-progress" class="progress-fill"></div></div><p style="color:#888; font-size: 13px; margin-top:0;">Next evolution at level <span id="next-evo">10</span>!</p><button class="game-btn" style="background:#1e90ff; font-size:20px; padding: 20px 40px; margin-top: 30px;" onclick="waterPlant()">Water 💧</button></div></div>
+    <div id="dateApp" class="app-window"><div class="app-header"><div style="width:40px;"></div><span class="app-title">Date Roulette</span><span class="done-btn" onclick="closeApp('dateApp')">Done</span></div><div style="padding: 40px 20px; text-align: center;"><div id="roulette-emoji" style="font-size: 80px; margin-bottom: 20px; display:inline-block;">🎲</div><h3 style="color:#333; margin: 20px 0;">Can't decide on date night?</h3><p style="color:#666; font-size: 14px; margin-bottom: 30px;">We'll randomly pick dinner & activity!</p><button class="game-btn" style="background:#ff4757; font-size:18px; padding: 18px 40px;" onclick="spinDate()">Spin the Wheel!</button></div></div>
+    <div id="countApp" class="app-window"><div class="app-header"><div style="width:40px;"></div><span class="app-title">Countdown</span><span class="done-btn" onclick="closeApp('countApp')">Done</span></div><div style="padding: 30px 20px; text-align: center;"><div style="background: white; border-radius: 30px; padding: 40px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 30px;"><h1 id="countdown-display" style="font-size: 70px; color: var(--ios-blue); margin:0; font-weight: 800; letter-spacing: -2px;">0</h1><h3 style="color:#888; margin-top:5px; text-transform: uppercase; font-size: 14px; letter-spacing: 2px;">Days Left</h3></div><p style="font-weight: bold; color: #555;">Set Target Date:</p><input type="date" id="date-input" class="chat-input" style="width:80%; margin:10px 0 20px 0; text-align: center;"><button class="game-btn" onclick="setCountdown()">Start Countdown</button></div></div>
+    <div id="magicApp" class="app-window"><div class="app-header"><div style="width:40px;"></div><span class="app-title">Magic 8-Ball</span><span class="done-btn" onclick="closeApp('magicApp')">Done</span></div><div style="padding: 40px 20px; text-align: center;"><div id="eightball-emoji" style="font-size: 90px; margin-bottom: 30px; display: inline-block;">🎱</div><input id="eightball-input" class="chat-input" placeholder="Ask a yes/no question..." style="width:90%; margin-bottom: 30px; text-align: center;"><button class="game-btn" style="background: #2c3e50; padding: 18px 50px; font-size: 18px;" onclick="shake8Ball()">Shake & Reveal</button></div></div>
     <div id="moodApp" class="app-window"><div class="app-header"><div style="width:40px;"></div><span class="app-title">Set Mood</span><span class="done-btn" onclick="closeApp('moodApp')">Done</span></div><div style="padding: 30px 20px; text-align: center;"><h3 style="color:#333; margin-bottom: 25px;">How are you feeling?</h3><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;"><button class="game-btn" onclick="setMood('Happy 😊')" style="margin:0; width:100%; background:#7bed9f; color:black;">Happy 😊</button><button class="game-btn" onclick="setMood('Miss You 🥺')" style="margin:0; width:100%; background:#ff7f50; color:white;">Miss You 🥺</button><button class="game-btn" onclick="setMood('Sleepy 😴')" style="margin:0; width:100%; background:#a4b0be; color:white;">Sleepy 😴</button><button class="game-btn" onclick="setMood('Busy 💻')" style="margin:0; width:100%; background:#ff4757; color:white;">Busy 💻</button></div></div></div>
     
-    <div id="messageApp" class="app-window">
-        <div class="app-header"><div style="width:40px;"></div><span class="app-title">Messages</span><span class="done-btn" onclick="closeApp('messageApp')">Done</span></div>
-        <div id="main-chat" class="chat-container"></div>
-        <div class="input-area"><input id="main-input" class="chat-input" placeholder="iMessage" autocomplete="off" oninput="handleTyping()" /><button onclick="sendMessage('main-input')" style="background:var(--ios-blue); color:white; border:none; border-radius:50%; width:40px; height:40px; font-weight:bold;">↑</button></div>
-    </div>
+    <div id="messageApp" class="app-window"><div class="app-header"><div style="width:40px;"></div><span class="app-title">Messages</span><span class="done-btn" onclick="closeApp('messageApp')">Done</span></div><div id="main-chat" class="chat-container"></div><div class="input-area"><input id="main-input" class="chat-input" placeholder="iMessage" autocomplete="off" oninput="handleTyping()" /><button onclick="sendMessage('main-input')" style="background:var(--ios-blue); color:white; border:none; border-radius:50%; width:40px; height:40px; font-weight:bold;">↑</button></div></div>
     
     <div id="gamesApp" class="app-window">
         <div class="app-header"><div style="width:40px;"></div><span id="game-title" class="app-title">App</span><span class="done-btn" onclick="closeApp('gamesApp')">Done</span></div>
         <div id="game-screens" style="text-align: center; border-bottom: 1px solid #ddd; padding-bottom: 20px; background: white;">
             <div id="screen-ttt"><h3 id="ttt-status">X's Turn</h3><div id="ttt-grid"><div class="cell" onclick="makeMove(0)"></div><div class="cell" onclick="makeMove(1)"></div><div class="cell" onclick="makeMove(2)"></div><div class="cell" onclick="makeMove(3)"></div><div class="cell" onclick="makeMove(4)"></div><div class="cell" onclick="makeMove(5)"></div><div class="cell" onclick="makeMove(6)"></div><div class="cell" onclick="makeMove(7)"></div><div class="cell" onclick="makeMove(8)"></div></div><button class="game-btn" onclick="resetGame()">Restart Game</button></div>
-            <div id="screen-draw" style="display:none; padding-top: 15px;">
-                <div class="draw-tools"><input type="color" id="color-picker" value="#ff4757" style="width: 35px; height: 35px; border: none; border-radius: 50%; cursor: pointer;" onchange="setBrush(this.value)"><div class="color-btn" style="background:#2ed573;" onclick="setBrush('#2ed573')"></div><div class="color-btn" style="background:#1e90ff;" onclick="setBrush('#1e90ff')"></div><div class="color-btn" style="background:#2f3542;" onclick="setBrush('#2f3542')"></div><button class="eraser-btn" onclick="setBrush('#ffffff')">Eraser</button></div>
-                <div class="draw-tools" style="margin-bottom: 15px;"><span style="font-size: 14px; font-weight: bold; color: #555;">Thickness:</span><input type="range" id="brush-size" style="width: 120px;" min="2" max="20" value="4" onchange="updateSize(this.value)"></div>
-                <canvas id="draw-board" width="280" height="280"></canvas>
-                <button class="game-btn" style="background: #ff9f43;" onclick="clearCanvas()">Erase Canvas</button>
-            </div>
+            <div id="screen-draw" style="display:none; padding-top: 15px;"><div class="draw-tools"><input type="color" id="color-picker" value="#ff4757" style="width: 35px; height: 35px; border: none; border-radius: 50%; cursor: pointer;" onchange="setBrush(this.value)"><div class="color-btn" style="background:#2ed573;" onclick="setBrush('#2ed573')"></div><div class="color-btn" style="background:#1e90ff;" onclick="setBrush('#1e90ff')"></div><div class="color-btn" style="background:#2f3542;" onclick="setBrush('#2f3542')"></div><button class="eraser-btn" onclick="setBrush('#ffffff')">Eraser</button></div><div class="draw-tools" style="margin-bottom: 15px;"><span style="font-size: 14px; font-weight: bold; color: #555;">Thickness:</span><input type="range" id="brush-size" style="width: 120px;" min="2" max="20" value="4" onchange="updateSize(this.value)"></div><canvas id="draw-board" width="280" height="280"></canvas><button class="game-btn" style="background: #ff9f43;" onclick="clearCanvas()">Erase Canvas</button></div>
         </div>
         <div id="mini-chat" class="chat-container" style="background: #f2f2f7; padding: 10px; flex: 1;"></div>
         <div class="input-area" style="padding: 10px; background:white;"><input id="mini-input" class="chat-input" placeholder="Trash talk..." autocomplete="off" oninput="handleTyping()" /><button onclick="sendMessage('mini-input')" style="background:#2ed573; color:white; border:none; border-radius:50%; width:40px; height:40px; font-weight:bold;">↑</button></div>
@@ -228,11 +209,7 @@
 
         function openApp(id) { document.getElementById(id).style.display = 'flex'; }
         function closeApp(id) { document.getElementById(id).style.display = 'none'; }
-        function openGameApp(gameId, title) {
-            document.getElementById('game-title').innerText = title;
-            ['ttt', 'draw'].forEach(id => document.getElementById('screen-' + id).style.display = 'none');
-            document.getElementById('screen-' + gameId).style.display = 'block'; openApp('gamesApp');
-        }
+        function openGameApp(gameId, title) { document.getElementById('game-title').innerText = title; ['ttt', 'draw'].forEach(id => document.getElementById('screen-' + id).style.display = 'none'); document.getElementById('screen-' + gameId).style.display = 'block'; openApp('gamesApp'); }
 
         socket.on('notification', (text) => {
             const island = document.getElementById('dynamic-island'); document.getElementById('island-text').innerText = text;
@@ -240,6 +217,7 @@
             setTimeout(() => { island.classList.remove('island-active'); }, 4000);
         });
 
+        // Background APIs
         if ('getBattery' in navigator) { navigator.getBattery().then(function(battery) { function updateBattery() { let level = Math.round(battery.level * 100) + "%"; let icon = battery.charging ? "⚡" : "🔋"; socket.emit('update battery', level + " " + icon); } updateBattery(); battery.addEventListener('levelchange', updateBattery); battery.addEventListener('chargingchange', updateBattery); }); }
         socket.on('battery update', (batt) => { document.getElementById('partner-battery-display').innerText = batt; });
         function triggerBuzz() { socket.emit('send buzz'); }
@@ -249,96 +227,64 @@
         function setMood(mood) { socket.emit('set mood', mood); closeApp('moodApp'); }
         socket.on('mood update', mood => { document.getElementById('partner-mood-display').innerText = mood; });
 
-        // --- 🎵 MUSIC APP ---
-        function setMusic() { 
-            const song = document.getElementById('song-input').value; 
-            if(song) { socket.emit('set music', song); document.getElementById('song-input').value = ""; closeApp('musicApp'); } 
+        // --- NEW 4 APPS LOGIC ---
+        
+        // 🎬 WATCHLIST
+        function addMovie() { var input = document.getElementById('watch-input'); if(input.value) { socket.emit('add movie', input.value); input.value = ''; } }
+        function clearMovies() { socket.emit('clear movies'); }
+        socket.on('watchlist update', list => { const container = document.getElementById('watchlist-container'); container.innerHTML = ''; list.forEach(item => { let div = document.createElement('div'); div.className = 'list-item'; div.innerText = item; container.appendChild(div); }); });
+
+        // 🤔 WOULD YOU RATHER
+        const wyrPrompts = ["Read my mind OR see our future?", "Travel the world for a year OR buy our dream house tomorrow?", "Only eat my cooking forever OR I only eat your cooking forever?", "Never use a smartphone again OR never watch movies again?", "Always have to tell the truth OR always have to lie?"];
+        function generateWYR() { let p = wyrPrompts[Math.floor(Math.random() * wyrPrompts.length)]; let msg = `🤔 **Would You Rather:**\n${p}`; addMessageToBoth(msg, 'me'); socket.emit('chat message', {text: msg}); closeApp('wyrApp'); }
+
+        // 💖 LOVE METER
+        // Slowly drains love automatically every minute if app is open
+        setInterval(() => { if(Math.random() > 0.5) socket.emit('charge love', -1); }, 60000); 
+        function chargeLove() { 
+            socket.emit('charge love'); 
+            let p = document.getElementById('love-heart');
+            p.style.transform = "scale(1.3)"; setTimeout(() => p.style.transform = "scale(1)", 150);
         }
+        socket.on('love update', level => {
+            document.getElementById('love-level-text').innerText = level;
+            document.getElementById('partner-love-display').innerText = level + "% 💖";
+            document.getElementById('love-progress').style.width = level + '%';
+        });
+
+        // 🌙 SLEEP MODE
+        let isSleeping = false;
+        function toggleSleep() {
+            isSleeping = !isSleeping;
+            socket.emit('toggle sleep', isSleeping);
+            let btn = document.getElementById('sleep-btn');
+            if(isSleeping) { btn.innerText = "Wake Up ☀️"; btn.style.background = "#f1c40f"; document.getElementById('partner-mood-display').innerText = "Sleeping 😴"; }
+            else { btn.innerText = "Go to Sleep 🌙"; btn.style.background = "#330867"; socket.emit('set mood', 'Awake ☀️'); }
+            closeApp('sleepApp');
+        }
+        socket.on('sleep update', partnerSleeping => {
+            if(partnerSleeping) document.body.classList.add('sleeping');
+            else document.body.classList.remove('sleeping');
+        });
+
+        // --- OLD APPS LOGIC ---
+        function setMusic() { const song = document.getElementById('song-input').value; if(song) { socket.emit('set music', song); document.getElementById('song-input').value = ""; closeApp('musicApp'); } }
         function clearMusic() { socket.emit('set music', 'Silence 🤫'); closeApp('musicApp'); }
-        socket.on('music update', song => { 
-            document.getElementById('music-display').innerText = song; 
-            // Turn on/off equalizer animation based on if a song is playing
-            if(song === 'Silence 🤫') document.getElementById('music-eq').style.display = 'none';
-            else document.getElementById('music-eq').style.display = 'inline-flex';
-        });
+        socket.on('music update', song => { document.getElementById('music-display').innerText = song; if(song === 'Silence 🤫') document.getElementById('music-eq').style.display = 'none'; else document.getElementById('music-eq').style.display = 'inline-flex'; });
 
-        // --- 🪴 PLANT APP ---
         function waterPlant() { socket.emit('water plant'); }
-        socket.on('plant update', level => {
-            document.getElementById('plant-level-text').innerText = level;
-            
-            // Emoji evolution logic
-            let emoji = "🌱"; let nextEvo = 10;
-            if(level >= 10) { emoji = "🌿"; nextEvo = 30; }
-            if(level >= 30) { emoji = "🪴"; nextEvo = 60; }
-            if(level >= 60) { emoji = "🌸"; nextEvo = 100; }
-            if(level >= 100) { emoji = "🌳"; nextEvo = "MAX"; }
-            
-            document.getElementById('plant-emoji').innerText = emoji;
-            document.getElementById('next-evo').innerText = nextEvo;
-            
-            // Progress Bar Math
-            let progress = 100;
-            if(nextEvo !== "MAX") {
-                let prevEvo = 0;
-                if(level >= 10) prevEvo = 10;
-                if(level >= 30) prevEvo = 30;
-                if(level >= 60) prevEvo = 60;
-                progress = ((level - prevEvo) / (nextEvo - prevEvo)) * 100;
-            }
-            document.getElementById('plant-progress').style.width = progress + '%';
+        socket.on('plant update', level => { document.getElementById('plant-level-text').innerText = level; let emoji = "🌱"; let nextEvo = 10; if(level >= 10) { emoji = "🌿"; nextEvo = 30; } if(level >= 30) { emoji = "🪴"; nextEvo = 60; } if(level >= 60) { emoji = "🌸"; nextEvo = 100; } if(level >= 100) { emoji = "🌳"; nextEvo = "MAX"; } document.getElementById('plant-emoji').innerText = emoji; document.getElementById('next-evo').innerText = nextEvo; let progress = 100; if(nextEvo !== "MAX") { let prevEvo = 0; if(level >= 10) prevEvo = 10; if(level >= 30) prevEvo = 30; if(level >= 60) prevEvo = 60; progress = ((level - prevEvo) / (nextEvo - prevEvo)) * 100; } document.getElementById('plant-progress').style.width = progress + '%'; let p = document.getElementById('plant-emoji'); p.style.transform = "scale(1.2) translateY(-10px)"; setTimeout(() => p.style.transform = "scale(1) translateY(0)", 200); });
 
-            // Watering Bounce Animation
-            let p = document.getElementById('plant-emoji');
-            p.style.transform = "scale(1.2) translateY(-10px)"; 
-            setTimeout(() => p.style.transform = "scale(1) translateY(0)", 200);
-        });
-
-        // --- ⏳ COUNTDOWN APP ---
         function setCountdown() { const date = document.getElementById('date-input').value; if(date) { socket.emit('set countdown', date); closeApp('countApp'); } }
-        socket.on('countdown update', targetDate => {
-            setInterval(() => {
-                const diff = new Date(targetDate) - new Date();
-                const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-                document.getElementById('countdown-display').innerText = days > 0 ? days : 0;
-            }, 1000);
-        });
+        socket.on('countdown update', targetDate => { setInterval(() => { const diff = new Date(targetDate) - new Date(); const days = Math.ceil(diff / (1000 * 60 * 60 * 24)); document.getElementById('countdown-display').innerText = days > 0 ? days : 0; }, 1000); });
 
-        // --- 🍿 DATE ROULETTE ---
-        const dinners = ["Sushi 🍣", "Italian 🍝", "Burgers 🍔", "Tacos 🌮", "Cook Together 🍳"];
-        const activities = ["Netflix Movie 🍿", "Board Games 🎲", "Late Night Walk 🌙", "Deep Talk 🗣️", "Video Games 🎮"];
-        function spinDate() {
-            let r = document.getElementById('roulette-emoji');
-            r.classList.add('spinning'); // Add CSS spin class
-            
-            // Wait for 2 second animation to finish before announcing
-            setTimeout(() => {
-                r.classList.remove('spinning');
-                let d = dinners[Math.floor(Math.random() * dinners.length)];
-                let a = activities[Math.floor(Math.random() * activities.length)];
-                let msg = `🎲 **Date Night Pick!**\n🍽️ Dinner: ${d}\n🎬 Activity: ${a}`;
-                addMessageToBoth(msg, 'me'); socket.emit('chat message', {text: msg}); closeApp('dateApp');
-            }, 2000);
-        }
+        const dinners = ["Sushi 🍣", "Italian 🍝", "Burgers 🍔", "Tacos 🌮", "Cook Together 🍳"]; const activities = ["Netflix Movie 🍿", "Board Games 🎲", "Late Night Walk 🌙", "Deep Talk 🗣️", "Video Games 🎮"];
+        function spinDate() { let r = document.getElementById('roulette-emoji'); r.classList.add('spinning'); setTimeout(() => { r.classList.remove('spinning'); let d = dinners[Math.floor(Math.random() * dinners.length)]; let a = activities[Math.floor(Math.random() * activities.length)]; let msg = `🎲 **Date Night Pick!**\n🍽️ Dinner: ${d}\n🎬 Activity: ${a}`; addMessageToBoth(msg, 'me'); socket.emit('chat message', {text: msg}); closeApp('dateApp'); }, 2000); }
 
-        // --- 🎱 MAGIC 8-BALL ---
         const answers = ["Yes, definitely! ✨", "No way. 🙅", "Ask again later ⏳", "It is certain 💯", "Very doubtful 😬", "Absolutely! ❤️"];
-        function shake8Ball() {
-            let q = document.getElementById('eightball-input').value; if(!q) return;
-            let ball = document.getElementById('eightball-emoji');
-            ball.classList.add('shake-element'); // Add CSS shake class
-            
-            // Wait for 1 second shake animation
-            setTimeout(() => {
-                ball.classList.remove('shake-element');
-                let a = answers[Math.floor(Math.random() * answers.length)];
-                let msg = `🎱 **Question:** ${q}\n✨ **Answer:** ${a}`;
-                addMessageToBoth(msg, 'me'); socket.emit('chat message', {text: msg});
-                document.getElementById('eightball-input').value = ""; closeApp('magicApp');
-            }, 1000);
-        }
+        function shake8Ball() { let q = document.getElementById('eightball-input').value; if(!q) return; let ball = document.getElementById('eightball-emoji'); ball.classList.add('shake-element'); setTimeout(() => { ball.classList.remove('shake-element'); let a = answers[Math.floor(Math.random() * answers.length)]; let msg = `🎱 **Question:** ${q}\n✨ **Answer:** ${a}`; addMessageToBoth(msg, 'me'); socket.emit('chat message', {text: msg}); document.getElementById('eightball-input').value = ""; closeApp('magicApp'); }, 1000); }
 
-        // Chat & Games
+        // Chat & Games Core
         function addMessageToBoth(text, type) { const now = new Date(); let hours = now.getHours(); let ampm = hours >= 12 ? 'PM' : 'AM'; hours = hours % 12 || 12; let mins = now.getMinutes() < 10 ? '0' + now.getMinutes() : now.getMinutes(); let timeStr = hours + ':' + mins + ' ' + ampm; const createBubble = () => { var div = document.createElement('div'); div.className = 'bubble ' + type; div.innerHTML = text.replace(/\n/g, '<br>') + `<span class="msg-time">${timeStr}</span>`; return div; }; let mainChat = document.getElementById('main-chat'); mainChat.appendChild(createBubble()); mainChat.scrollTop = mainChat.scrollHeight; let miniChat = document.getElementById('mini-chat'); miniChat.appendChild(createBubble()); miniChat.scrollTop = miniChat.scrollHeight; let typingBubbles = document.querySelectorAll('.typing-bubble-container'); typingBubbles.forEach(b => b.remove()); }
         function sendMessage(inputId) { var inputField = document.getElementById(inputId); if(inputField.value) { addMessageToBoth(inputField.value, 'me'); socket.emit('chat message', {text: inputField.value}); inputField.value = ''; socket.emit('stop typing'); } }
         socket.on('chat message', d => addMessageToBoth(d.text, 'them'));
