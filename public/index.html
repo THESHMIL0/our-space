@@ -6,89 +6,107 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="/manifest.json">
-    <title>Our Space</title>
+    <title>Our Space OS</title>
     <style>
-        :root { --primary: #ff4757; --bg: #f8f9fa; }
-        body { font-family: -apple-system, sans-serif; margin: 0; background: var(--bg); overflow: hidden; }
+        :root { --primary: #ff4757; }
+        /* Beautiful Romantic Gradient Wallpaper */
+        body { font-family: -apple-system, sans-serif; margin: 0; background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%); overflow: hidden; color: #333; height: 100vh; display: flex; flex-direction: column; }
         
-        #dashboard-header { padding: 60px 20px 40px; text-align: center; background: white; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        #counter-days { font-size: 56px; font-weight: 800; color: var(--primary); margin: 0; }
+        /* Phone Status Bar */
+        #status-bar { display: flex; justify-content: space-between; padding: 12px 25px; font-weight: bold; color: rgba(0,0,0,0.7); font-size: 14px; }
         
-        #home-screen { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; padding: 50px 30px; }
-        .app-card { background: white; padding: 35px 10px; border-radius: 24px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer; transition: 0.2s; }
-        .app-card:active { transform: scale(0.95); }
+        /* Glassmorphism Widgets */
+        #widget-area { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
+        .widget { background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.5); border-radius: 25px; padding: 20px; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.05); }
         
-        .app-window { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: none; flex-direction: column; z-index: 100; }
-        .app-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; font-weight: bold; }
+        #counter-days { font-size: 40px; font-weight: 800; color: var(--primary); margin: 0; }
         
-        /* Universal Chat Styles */
+        .note-input { width: 100%; height: 80px; background: transparent; border: none; outline: none; resize: none; font-family: inherit; font-size: 14px; color: #333; text-align: center; }
+
+        /* Main App Grid */
+        #home-screen { flex: 1; padding: 20px; }
+        
+        /* Bottom App Dock */
+        #dock { background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); margin: 15px; border-radius: 35px; padding: 15px; display: flex; justify-content: space-around; box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
+        .dock-icon { width: 60px; height: 60px; background: white; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.2s; }
+        .dock-icon:active { transform: scale(0.9); }
+        
+        /* App Windows (Slide up like iOS) */
+        .app-window { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f8f9fa; display: none; flex-direction: column; z-index: 100; animation: slideUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .app-header { padding: 50px 20px 15px; display: flex; justify-content: space-between; align-items: center; background: white; border-bottom: 1px solid #eee; font-weight: bold; font-size: 18px; }
+        
+        /* Chat Styles */
         .chat-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
         .bubble { max-width: 75%; padding: 12px 16px; border-radius: 20px; font-size: 15px; }
         .me { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 4px; }
         .them { align-self: flex-start; background: #e9e9eb; color: black; border-bottom-left-radius: 4px; }
         .input-area { padding: 15px; border-top: 1px solid #eee; display: flex; gap: 10px; background: white; padding-bottom: 30px; }
-        .chat-input { flex: 1; padding: 12px; border-radius: 25px; border: 1px solid #eee; outline: none; background: #f1f2f6; }
+        .chat-input { flex: 1; padding: 12px 20px; border-radius: 25px; border: 1px solid #eee; outline: none; background: #f1f2f6; }
         
-        /* Game Specific Styles */
-        .game-nav { display: flex; background: #f1f2f6; padding: 5px; border-radius: 20px; margin: 15px; overflow-x: auto; white-space: nowrap; }
-        .game-nav button { flex: 1; padding: 10px 15px; border: none; background: transparent; border-radius: 15px; font-weight: bold; cursor: pointer; color: #555; }
-        .game-nav button.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        /* Games Styles */
+        .game-nav { display: flex; background: #eee; padding: 5px; border-radius: 25px; margin: 15px; overflow-x: auto; }
+        .game-nav button { flex: 1; padding: 10px 15px; border: none; background: transparent; border-radius: 20px; font-weight: bold; cursor: pointer; color: #555; }
+        .game-nav button.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         
         #ttt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 250px; margin: 20px auto; }
-        .cell { width: 75px; height: 75px; background: #f1f2f6; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 35px; font-weight: bold; cursor: pointer;}
+        .cell { width: 75px; height: 75px; background: white; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 35px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.05);}
         .game-btn { display:block; margin: 15px auto; padding: 12px 25px; border-radius: 25px; border: none; background: #2f3542; color: white; font-weight: bold; font-size: 15px; cursor: pointer;}
-
-        /* Drawing Canvas Styles */
-        #draw-board { border: 2px solid #eee; border-radius: 15px; background: white; touch-action: none; margin: 10px auto; display: block; box-shadow: inset 0 0 10px rgba(0,0,0,0.05); }
+        #draw-board { border-radius: 15px; background: white; touch-action: none; margin: 10px auto; display: block; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
 
         /* Floating Heart Animation */
-        .floating-heart { position: fixed; bottom: -50px; font-size: 40px; animation: floatUp 3s ease-in forwards; z-index: 1000; pointer-events: none; }
-        @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-100vh) scale(1.5); opacity: 0; } }
-        
-        /* Send Love Button */
-        #love-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; border-radius: 50%; background: var(--primary); color: white; font-size: 25px; border: none; box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; z-index: 50; }
-        #love-btn:active { transform: scale(0.9); }
+        .floating-heart { position: fixed; bottom: -50px; font-size: 50px; animation: floatUp 3s ease-in forwards; z-index: 1000; pointer-events: none; }
+        @keyframes floatUp { 0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; } 100% { transform: translateY(-100vh) scale(1.5) rotate(20deg); opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <div id="dashboard-header">
-        <p id="counter-days">0</p>
-        <p style="opacity:0.6; font-size:14px; margin:0; font-weight:bold; letter-spacing: 1px;">DAYS OF US ❤️</p>
+    <div id="status-bar">
+        <span id="clock">12:00</span>
+        <span>5G &nbsp; 🔋 100%</span>
     </div>
 
-    <div id="home-screen">
-        <div class="app-card" onclick="openApp('messageApp')">
-            <span style="font-size:45px;">💬</span><br><br><span style="font-size:14px; font-weight:600;">Chat</span>
+    <div id="widget-area">
+        <div class="widget">
+            <p style="font-size: 12px; opacity: 0.7; margin: 0 0 5px; font-weight: bold;">DAYS OF US</p>
+            <p id="counter-days">0</p>
+            <p style="font-size: 20px; margin: 5px 0 0;">❤️</p>
         </div>
-        <div class="app-card" onclick="openApp('gamesApp')">
-            <span style="font-size:45px;">🎮</span><br><br><span style="font-size:14px; font-weight:600;">Play</span>
+        
+        <div class="widget">
+            <p style="font-size: 12px; opacity: 0.7; margin: 0 0 5px; font-weight: bold;">SHARED NOTE</p>
+            <textarea id="sticky-note" class="note-input" oninput="sendNote()" placeholder="Type a sweet note..."></textarea>
         </div>
     </div>
 
-    <button id="love-btn" onclick="triggerHeart()">❤️</button>
+    <div id="home-screen"></div>
+
+    <div id="dock">
+        <div class="dock-icon" onclick="openApp('messageApp')">💬</div>
+        <div class="dock-icon" onclick="openApp('gamesApp')">🎮</div>
+        <div class="dock-icon" onclick="triggerHeart()" style="background: var(--primary); color: white;">❤️</div>
+    </div>
 
     <div id="messageApp" class="app-window">
-        <div class="app-header"><span>My Love</span><span style="color:var(--primary); cursor:pointer;" onclick="closeApp('messageApp')">Close</span></div>
+        <div class="app-header"><span>Messages</span><span style="color:var(--primary); cursor:pointer;" onclick="closeApp('messageApp')">Done</span></div>
         <div id="main-chat" class="chat-container"></div>
         <div class="input-area">
-            <input id="main-input" class="chat-input" placeholder="Message..." autocomplete="off" />
+            <input id="main-input" class="chat-input" placeholder="iMessage" autocomplete="off" />
             <button onclick="sendMessage('main-input')" style="background:var(--primary); color:white; border:none; border-radius:50%; width:40px; height:40px;">↑</button>
         </div>
     </div>
 
     <div id="gamesApp" class="app-window">
-        <div class="app-header"><span>Game Room</span><span style="color:var(--primary); cursor:pointer;" onclick="closeApp('gamesApp')">Quit</span></div>
+        <div class="app-header"><span>Game Room</span><span style="color:var(--primary); cursor:pointer;" onclick="closeApp('gamesApp')">Done</span></div>
         
         <div class="game-nav">
-            <button id="tab-ttt" class="active" onclick="showGame('ttt')">Tic-Tac-Toe</button>
-            <button id="tab-draw" onclick="showGame('draw')">Draw 🎨</button>
-            <button id="tab-tod" onclick="showGame('tod')">Truth/Dare</button>
+            <button id="tab-ttt" class="active" onclick="showGame('ttt')">Tic-Tac</button>
+            <button id="tab-draw" onclick="showGame('draw')">Draw</button>
+            <button id="tab-tod" onclick="showGame('tod')">Dare</button>
             <button id="tab-coin" onclick="showGame('coin')">Coin</button>
         </div>
 
         <div id="game-screens" style="text-align: center; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-            
             <div id="screen-ttt">
                 <div id="ttt-grid">
                     <div class="cell" onclick="makeMove(0)"></div><div class="cell" onclick="makeMove(1)"></div><div class="cell" onclick="makeMove(2)"></div>
@@ -97,26 +115,21 @@
                 </div>
                 <button class="game-btn" onclick="resetGame()">Restart Board</button>
             </div>
-
             <div id="screen-draw" style="display:none; padding-top: 10px;">
                 <canvas id="draw-board" width="280" height="280"></canvas>
                 <button class="game-btn" style="background: #ff9f43;" onclick="clearCanvas()">Erase Canvas</button>
             </div>
-
             <div id="screen-tod" style="display:none; padding: 20px;">
-                <h3 style="margin-bottom: 5px;">Truth or Dare</h3>
-                <p style="color: #666; font-size: 14px; margin-bottom: 20px;">Tap to generate a prompt!</p>
+                <h3>Truth or Dare</h3>
                 <button class="game-btn" style="background: #ff4757;" onclick="playToD()">Spin the Wheel 🎲</button>
             </div>
-
             <div id="screen-coin" style="display:none; padding: 20px;">
-                <h3 style="margin-bottom: 5px;">Coin Flip</h3>
-                <p style="color: #666; font-size: 14px; margin-bottom: 20px;">Can't decide on dinner?</p>
+                <h3>Coin Flip</h3>
                 <button class="game-btn" style="background: #eccc68; color: black;" onclick="flipCoin()">Flip a Coin 🪙</button>
             </div>
         </div>
 
-        <div id="mini-chat" class="chat-container" style="background: #fafafa; padding: 10px; flex: 1;"></div>
+        <div id="mini-chat" class="chat-container" style="background: #fdfdfd; padding: 10px; flex: 1;"></div>
         <div class="input-area" style="padding: 10px;">
             <input id="mini-input" class="chat-input" placeholder="Trash talk..." autocomplete="off" />
             <button onclick="sendMessage('mini-input')" style="background:#2ed573; color:white; border:none; border-radius:50%; width:40px; height:40px;">↑</button>
@@ -127,140 +140,86 @@
     <script>
         var socket = io();
         
-        // 1. DATE COUNTER
-        const startDate = new Date("2024-01-01"); 
+        // --- PHONE CLOCK ---
+        function updateClock() {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            hours = hours % 12 || 12;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            document.getElementById('clock').innerText = hours + ':' + minutes;
+        }
+        setInterval(updateClock, 1000); updateClock();
+
+        // --- COUNTER WIDGET ---
+        const startDate = new Date("2024-01-01"); // UPDATE THIS
         function updateCounter() {
             const diff = Math.floor((new Date() - startDate) / (1000 * 60 * 60 * 24));
             document.getElementById('counter-days').innerText = diff;
         }
         updateCounter();
 
+        // --- STICKY NOTE WIDGET ---
+        const noteBox = document.getElementById('sticky-note');
+        function sendNote() { socket.emit('update note', noteBox.value); }
+        socket.on('note update', text => { if(document.activeElement !== noteBox) noteBox.value = text; });
+
+        // APP NAVIGATION
         function openApp(id) { document.getElementById(id).style.display = 'flex'; }
         function closeApp(id) { document.getElementById(id).style.display = 'none'; }
 
-        // 2. CHAT SYSTEM
+        // --- CHAT SYSTEM ---
         function addMessageToBoth(text, type) {
-            const createBubble = () => {
-                var div = document.createElement('div');
-                div.className = 'bubble ' + type;
-                div.textContent = text;
-                return div;
-            };
-            let mainChat = document.getElementById('main-chat');
-            mainChat.appendChild(createBubble()); mainChat.scrollTop = mainChat.scrollHeight;
-            let miniChat = document.getElementById('mini-chat');
-            miniChat.appendChild(createBubble()); miniChat.scrollTop = miniChat.scrollHeight;
+            const createBubble = () => { var div = document.createElement('div'); div.className = 'bubble ' + type; div.textContent = text; return div; };
+            let mainChat = document.getElementById('main-chat'); mainChat.appendChild(createBubble()); mainChat.scrollTop = mainChat.scrollHeight;
+            let miniChat = document.getElementById('mini-chat'); miniChat.appendChild(createBubble()); miniChat.scrollTop = miniChat.scrollHeight;
         }
         function sendMessage(inputId) {
             var inputField = document.getElementById(inputId);
-            if(inputField.value) {
-                let msgText = inputField.value;
-                addMessageToBoth(msgText, 'me'); 
-                socket.emit('chat message', {text: msgText}); 
-                inputField.value = '';
-            }
+            if(inputField.value) { addMessageToBoth(inputField.value, 'me'); socket.emit('chat message', {text: inputField.value}); inputField.value = ''; }
         }
         socket.on('chat message', d => addMessageToBoth(d.text, 'them'));
 
-        // 3. GAME NAVIGATION
+        // --- GAME MENU ---
         function showGame(gameId) {
-            ['ttt', 'draw', 'tod', 'coin'].forEach(id => {
-                document.getElementById('screen-' + id).style.display = 'none';
-                document.getElementById('tab-' + id).className = '';
-            });
-            document.getElementById('screen-' + gameId).style.display = 'block';
-            document.getElementById('tab-' + gameId).className = 'active';
+            ['ttt', 'draw', 'tod', 'coin'].forEach(id => { document.getElementById('screen-' + id).style.display = 'none'; document.getElementById('tab-' + id).className = ''; });
+            document.getElementById('screen-' + gameId).style.display = 'block'; document.getElementById('tab-' + gameId).className = 'active';
         }
 
-        // 4. TIC TAC TOE
+        // --- TIC TAC TOE ---
         let currentTurn = 'X'; 
         function makeMove(idx) { socket.emit('make move', { index: idx, symbol: currentTurn }); }
         socket.on('game update', state => {
-            const cells = document.querySelectorAll('.cell');
-            let xCount = 0; let oCount = 0;
-            state.forEach((val, i) => { 
-                cells[i].innerText = val || ''; 
-                if (val === 'X') xCount++; if (val === 'O') oCount++;
-                cells[i].style.color = val === 'X' ? '#ff4757' : '#2ed573';
-            });
+            const cells = document.querySelectorAll('.cell'); let xCount = 0; let oCount = 0;
+            state.forEach((val, i) => { cells[i].innerText = val || ''; if (val === 'X') xCount++; if (val === 'O') oCount++; cells[i].style.color = val === 'X' ? '#ff4757' : '#2ed573'; });
             currentTurn = (xCount > oCount) ? 'O' : 'X';
         });
         function resetGame() { socket.emit('reset game'); }
 
-        // 5. TRUTH OR DARE & COIN FLIP
-        const prompts = ["Truth: What was your first impression of me?", "Dare: Send the silliest selfie you can take right now.", "Truth: What is your favorite memory of us?", "Dare: Type your next 3 messages using only emojis.", "Truth: What is one secret you've never told me?", "Dare: Let me pick what we eat next time we go out!"];
-        function playToD() {
-            let msg = "🎲 " + prompts[Math.floor(Math.random() * prompts.length)];
-            addMessageToBoth(msg, 'me'); socket.emit('chat message', {text: msg});
-        }
-        function flipCoin() {
-            let msg = "🪙 I flipped a coin and got: **" + (Math.random() < 0.5 ? "Heads" : "Tails") + "**!";
-            addMessageToBoth(msg, 'me'); socket.emit('chat message', {text: msg});
-        }
+        // --- TRUTH/DARE & COIN ---
+        const prompts = ["Truth: What was your first impression of me?", "Dare: Send the silliest selfie you can take.", "Truth: What is your favorite memory of us?", "Dare: Type your next 3 messages using only emojis.", "Truth: One secret you've never told me?", "Dare: Let me pick what we eat next!"];
+        function playToD() { let msg = "🎲 " + prompts[Math.floor(Math.random() * prompts.length)]; addMessageToBoth(msg, 'me'); socket.emit('chat message', {text: msg}); }
+        function flipCoin() { let msg = "🪙 I flipped a coin: **" + (Math.random() < 0.5 ? "Heads" : "Tails") + "**!"; addMessageToBoth(msg, 'me'); socket.emit('chat message', {text: msg}); }
 
-        // 6. HEART BOMB (NEW)
+        // --- HEART BOMB BUTTON (MOVED TO DOCK) ---
         function triggerHeart() { socket.emit('send heart'); }
         socket.on('show heart', () => {
-            const heart = document.createElement('div');
-            heart.innerText = '❤️';
-            heart.className = 'floating-heart';
-            heart.style.left = Math.random() * 80 + 10 + 'vw'; // Random horizontal position
-            document.body.appendChild(heart);
-            setTimeout(() => heart.remove(), 3000); // Cleanup after animation
+            const heart = document.createElement('div'); heart.innerText = '❤️'; heart.className = 'floating-heart';
+            heart.style.left = Math.random() * 80 + 10 + 'vw'; document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 3000);
         });
 
-        // 7. LIVE DRAWING BOARD (NEW)
-        const canvas = document.getElementById('draw-board');
-        const ctx = canvas.getContext('2d');
-        ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.strokeStyle = '#ff4757';
-        let drawing = false;
-
-        function getPos(e) {
-            const rect = canvas.getBoundingClientRect();
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            return { x: clientX - rect.left, y: clientY - rect.top };
-        }
-
-        function startDraw(e) {
-            drawing = true; const pos = getPos(e);
-            socket.emit('draw', { type: 'start', x: pos.x, y: pos.y });
-            ctx.beginPath(); ctx.moveTo(pos.x, pos.y);
-            e.preventDefault(); // Prevent scrolling on mobile
-        }
-
-        function drawLine(e) {
-            if (!drawing) return; const pos = getPos(e);
-            socket.emit('draw', { type: 'draw', x: pos.x, y: pos.y });
-            ctx.lineTo(pos.x, pos.y); ctx.stroke();
-            e.preventDefault();
-        }
-
+        // --- LIVE DRAWING ---
+        const canvas = document.getElementById('draw-board'); const ctx = canvas.getContext('2d');
+        ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.strokeStyle = '#ff4757'; let drawing = false;
+        function getPos(e) { const rect = canvas.getBoundingClientRect(); return { x: (e.touches ? e.touches[0].clientX : e.clientX) - rect.left, y: (e.touches ? e.touches[0].clientY : e.clientY) - rect.top }; }
+        function startDraw(e) { drawing = true; const pos = getPos(e); socket.emit('draw', { type: 'start', x: pos.x, y: pos.y }); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); e.preventDefault(); }
+        function drawLine(e) { if (!drawing) return; const pos = getPos(e); socket.emit('draw', { type: 'draw', x: pos.x, y: pos.y }); ctx.lineTo(pos.x, pos.y); ctx.stroke(); e.preventDefault(); }
         function stopDraw() { drawing = false; ctx.beginPath(); }
-
-        // Mobile and PC events
-        canvas.addEventListener('mousedown', startDraw);
-        canvas.addEventListener('mousemove', drawLine);
-        canvas.addEventListener('mouseup', stopDraw);
-        canvas.addEventListener('touchstart', startDraw, {passive: false});
-        canvas.addEventListener('touchmove', drawLine, {passive: false});
-        canvas.addEventListener('touchend', stopDraw);
-
-        // Receive drawing from partner
-        socket.on('draw', data => {
-            if (data.type === 'start') {
-                ctx.beginPath(); ctx.moveTo(data.x, data.y);
-            } else if (data.type === 'draw') {
-                ctx.lineTo(data.x, data.y); ctx.stroke();
-            } else if (data.type === 'clear') {
-                ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.beginPath();
-            }
-        });
-
-        function clearCanvas() {
-            socket.emit('draw', { type: 'clear' });
-            ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.beginPath();
-        }
+        canvas.addEventListener('mousedown', startDraw); canvas.addEventListener('mousemove', drawLine); canvas.addEventListener('mouseup', stopDraw);
+        canvas.addEventListener('touchstart', startDraw, {passive: false}); canvas.addEventListener('touchmove', drawLine, {passive: false}); canvas.addEventListener('touchend', stopDraw);
+        socket.on('draw', data => { if (data.type === 'start') { ctx.beginPath(); ctx.moveTo(data.x, data.y); } else if (data.type === 'draw') { ctx.lineTo(data.x, data.y); ctx.stroke(); } else if (data.type === 'clear') { ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.beginPath(); } });
+        function clearCanvas() { socket.emit('draw', { type: 'clear' }); ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.beginPath(); }
     </script>
 </body>
 </html>
