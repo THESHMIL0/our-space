@@ -30,14 +30,24 @@
         .chat-input { flex: 1; padding: 12px; border-radius: 25px; border: 1px solid #eee; outline: none; background: #f1f2f6; }
         
         /* Game Specific Styles */
-        .game-nav { display: flex; background: #f1f2f6; padding: 5px; border-radius: 20px; margin: 15px; }
-        .game-nav button { flex: 1; padding: 10px; border: none; background: transparent; border-radius: 15px; font-weight: bold; cursor: pointer; color: #555; }
+        .game-nav { display: flex; background: #f1f2f6; padding: 5px; border-radius: 20px; margin: 15px; overflow-x: auto; white-space: nowrap; }
+        .game-nav button { flex: 1; padding: 10px 15px; border: none; background: transparent; border-radius: 15px; font-weight: bold; cursor: pointer; color: #555; }
         .game-nav button.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         
         #ttt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 250px; margin: 20px auto; }
         .cell { width: 75px; height: 75px; background: #f1f2f6; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 35px; font-weight: bold; cursor: pointer;}
+        .game-btn { display:block; margin: 15px auto; padding: 12px 25px; border-radius: 25px; border: none; background: #2f3542; color: white; font-weight: bold; font-size: 15px; cursor: pointer;}
+
+        /* Drawing Canvas Styles */
+        #draw-board { border: 2px solid #eee; border-radius: 15px; background: white; touch-action: none; margin: 10px auto; display: block; box-shadow: inset 0 0 10px rgba(0,0,0,0.05); }
+
+        /* Floating Heart Animation */
+        .floating-heart { position: fixed; bottom: -50px; font-size: 40px; animation: floatUp 3s ease-in forwards; z-index: 1000; pointer-events: none; }
+        @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-100vh) scale(1.5); opacity: 0; } }
         
-        .game-btn { display:block; margin: 15px auto; padding: 15px 30px; border-radius: 25px; border: none; background: #2f3542; color: white; font-weight: bold; font-size: 16px; cursor: pointer;}
+        /* Send Love Button */
+        #love-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; border-radius: 50%; background: var(--primary); color: white; font-size: 25px; border: none; box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; z-index: 50; }
+        #love-btn:active { transform: scale(0.9); }
     </style>
 </head>
 <body>
@@ -56,6 +66,8 @@
         </div>
     </div>
 
+    <button id="love-btn" onclick="triggerHeart()">❤️</button>
+
     <div id="messageApp" class="app-window">
         <div class="app-header"><span>My Love</span><span style="color:var(--primary); cursor:pointer;" onclick="closeApp('messageApp')">Close</span></div>
         <div id="main-chat" class="chat-container"></div>
@@ -70,11 +82,12 @@
         
         <div class="game-nav">
             <button id="tab-ttt" class="active" onclick="showGame('ttt')">Tic-Tac-Toe</button>
+            <button id="tab-draw" onclick="showGame('draw')">Draw 🎨</button>
             <button id="tab-tod" onclick="showGame('tod')">Truth/Dare</button>
-            <button id="tab-coin" onclick="showGame('coin')">Coin Flip</button>
+            <button id="tab-coin" onclick="showGame('coin')">Coin</button>
         </div>
 
-        <div id="game-screens" style="padding: 10px; text-align: center; border-bottom: 1px solid #eee; padding-bottom: 20px;">
+        <div id="game-screens" style="text-align: center; border-bottom: 1px solid #eee; padding-bottom: 10px;">
             
             <div id="screen-ttt">
                 <div id="ttt-grid">
@@ -85,9 +98,14 @@
                 <button class="game-btn" onclick="resetGame()">Restart Board</button>
             </div>
 
+            <div id="screen-draw" style="display:none; padding-top: 10px;">
+                <canvas id="draw-board" width="280" height="280"></canvas>
+                <button class="game-btn" style="background: #ff9f43;" onclick="clearCanvas()">Erase Canvas</button>
+            </div>
+
             <div id="screen-tod" style="display:none; padding: 20px;">
                 <h3 style="margin-bottom: 5px;">Truth or Dare</h3>
-                <p style="color: #666; font-size: 14px; margin-bottom: 20px;">Tap to generate a prompt and send it to the chat!</p>
+                <p style="color: #666; font-size: 14px; margin-bottom: 20px;">Tap to generate a prompt!</p>
                 <button class="game-btn" style="background: #ff4757;" onclick="playToD()">Spin the Wheel 🎲</button>
             </div>
 
@@ -109,7 +127,7 @@
     <script>
         var socket = io();
         
-        // 1. RELATIONSHIP COUNTER (Format: YYYY-MM-DD)
+        // 1. DATE COUNTER
         const startDate = new Date("2024-01-01"); 
         function updateCounter() {
             const diff = Math.floor((new Date() - startDate) / (1000 * 60 * 60 * 24));
@@ -117,12 +135,10 @@
         }
         updateCounter();
 
-        // APP NAVIGATION
         function openApp(id) { document.getElementById(id).style.display = 'flex'; }
         function closeApp(id) { document.getElementById(id).style.display = 'none'; }
 
-        // --- UNIFIED CHAT SYSTEM ---
-        // This function adds the bubble to BOTH chat screens automatically!
+        // 2. CHAT SYSTEM
         function addMessageToBoth(text, type) {
             const createBubble = () => {
                 var div = document.createElement('div');
@@ -130,87 +146,120 @@
                 div.textContent = text;
                 return div;
             };
-            
-            // Add to Main Chat
             let mainChat = document.getElementById('main-chat');
-            mainChat.appendChild(createBubble());
-            mainChat.scrollTop = mainChat.scrollHeight;
-
-            // Add to Mini Game Chat
+            mainChat.appendChild(createBubble()); mainChat.scrollTop = mainChat.scrollHeight;
             let miniChat = document.getElementById('mini-chat');
-            miniChat.appendChild(createBubble());
-            miniChat.scrollTop = miniChat.scrollHeight;
+            miniChat.appendChild(createBubble()); miniChat.scrollTop = miniChat.scrollHeight;
         }
-
-        // Works for both the main input and the game input
         function sendMessage(inputId) {
             var inputField = document.getElementById(inputId);
             if(inputField.value) {
                 let msgText = inputField.value;
-                addMessageToBoth(msgText, 'me'); // Show locally
-                socket.emit('chat message', {text: msgText}); // Send to partner
+                addMessageToBoth(msgText, 'me'); 
+                socket.emit('chat message', {text: msgText}); 
                 inputField.value = '';
             }
         }
-        
         socket.on('chat message', d => addMessageToBoth(d.text, 'them'));
 
-        // --- GAME MENU LOGIC ---
+        // 3. GAME NAVIGATION
         function showGame(gameId) {
-            // Hide all
-            document.getElementById('screen-ttt').style.display = 'none';
-            document.getElementById('screen-tod').style.display = 'none';
-            document.getElementById('screen-coin').style.display = 'none';
-            document.getElementById('tab-ttt').className = '';
-            document.getElementById('tab-tod').className = '';
-            document.getElementById('tab-coin').className = '';
-            
-            // Show selected
+            ['ttt', 'draw', 'tod', 'coin'].forEach(id => {
+                document.getElementById('screen-' + id).style.display = 'none';
+                document.getElementById('tab-' + id).className = '';
+            });
             document.getElementById('screen-' + gameId).style.display = 'block';
             document.getElementById('tab-' + gameId).className = 'active';
         }
 
-        // --- TIC TAC TOE ---
+        // 4. TIC TAC TOE
         let currentTurn = 'X'; 
         function makeMove(idx) { socket.emit('make move', { index: idx, symbol: currentTurn }); }
-        
         socket.on('game update', state => {
             const cells = document.querySelectorAll('.cell');
             let xCount = 0; let oCount = 0;
             state.forEach((val, i) => { 
                 cells[i].innerText = val || ''; 
-                if (val === 'X') xCount++;
-                if (val === 'O') oCount++;
+                if (val === 'X') xCount++; if (val === 'O') oCount++;
                 cells[i].style.color = val === 'X' ? '#ff4757' : '#2ed573';
             });
             currentTurn = (xCount > oCount) ? 'O' : 'X';
         });
-        
         function resetGame() { socket.emit('reset game'); }
 
-        // --- TRUTH OR DARE ---
-        const prompts = [
-            "Truth: What was your first impression of me?",
-            "Dare: Send the silliest selfie you can take right now.",
-            "Truth: What is your favorite memory of us?",
-            "Dare: Type your next 3 messages using only emojis.",
-            "Truth: What is one secret you've never told me?",
-            "Dare: Let me pick what we eat next time we go out!"
-        ];
-        
+        // 5. TRUTH OR DARE & COIN FLIP
+        const prompts = ["Truth: What was your first impression of me?", "Dare: Send the silliest selfie you can take right now.", "Truth: What is your favorite memory of us?", "Dare: Type your next 3 messages using only emojis.", "Truth: What is one secret you've never told me?", "Dare: Let me pick what we eat next time we go out!"];
         function playToD() {
-            let randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
-            let msg = "🎲 " + randomPrompt;
-            addMessageToBoth(msg, 'me');
-            socket.emit('chat message', {text: msg});
+            let msg = "🎲 " + prompts[Math.floor(Math.random() * prompts.length)];
+            addMessageToBoth(msg, 'me'); socket.emit('chat message', {text: msg});
+        }
+        function flipCoin() {
+            let msg = "🪙 I flipped a coin and got: **" + (Math.random() < 0.5 ? "Heads" : "Tails") + "**!";
+            addMessageToBoth(msg, 'me'); socket.emit('chat message', {text: msg});
         }
 
-        // --- COIN FLIP ---
-        function flipCoin() {
-            let result = Math.random() < 0.5 ? "Heads" : "Tails";
-            let msg = "🪙 I flipped a coin and got: **" + result + "**!";
-            addMessageToBoth(msg, 'me');
-            socket.emit('chat message', {text: msg});
+        // 6. HEART BOMB (NEW)
+        function triggerHeart() { socket.emit('send heart'); }
+        socket.on('show heart', () => {
+            const heart = document.createElement('div');
+            heart.innerText = '❤️';
+            heart.className = 'floating-heart';
+            heart.style.left = Math.random() * 80 + 10 + 'vw'; // Random horizontal position
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 3000); // Cleanup after animation
+        });
+
+        // 7. LIVE DRAWING BOARD (NEW)
+        const canvas = document.getElementById('draw-board');
+        const ctx = canvas.getContext('2d');
+        ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.strokeStyle = '#ff4757';
+        let drawing = false;
+
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return { x: clientX - rect.left, y: clientY - rect.top };
+        }
+
+        function startDraw(e) {
+            drawing = true; const pos = getPos(e);
+            socket.emit('draw', { type: 'start', x: pos.x, y: pos.y });
+            ctx.beginPath(); ctx.moveTo(pos.x, pos.y);
+            e.preventDefault(); // Prevent scrolling on mobile
+        }
+
+        function drawLine(e) {
+            if (!drawing) return; const pos = getPos(e);
+            socket.emit('draw', { type: 'draw', x: pos.x, y: pos.y });
+            ctx.lineTo(pos.x, pos.y); ctx.stroke();
+            e.preventDefault();
+        }
+
+        function stopDraw() { drawing = false; ctx.beginPath(); }
+
+        // Mobile and PC events
+        canvas.addEventListener('mousedown', startDraw);
+        canvas.addEventListener('mousemove', drawLine);
+        canvas.addEventListener('mouseup', stopDraw);
+        canvas.addEventListener('touchstart', startDraw, {passive: false});
+        canvas.addEventListener('touchmove', drawLine, {passive: false});
+        canvas.addEventListener('touchend', stopDraw);
+
+        // Receive drawing from partner
+        socket.on('draw', data => {
+            if (data.type === 'start') {
+                ctx.beginPath(); ctx.moveTo(data.x, data.y);
+            } else if (data.type === 'draw') {
+                ctx.lineTo(data.x, data.y); ctx.stroke();
+            } else if (data.type === 'clear') {
+                ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.beginPath();
+            }
+        });
+
+        function clearCanvas() {
+            socket.emit('draw', { type: 'clear' });
+            ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.beginPath();
         }
     </script>
 </body>
