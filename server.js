@@ -21,7 +21,7 @@ let partnerSleeping = false;
 let locketImage = ""; 
 let partnerBattery = "100%"; 
 
-// 🧠 NEW: Memory Match State
+// 🧠 Memory Match State
 let memoryBoard = []; let memoryFlipped = []; let memoryMatched = [];
 function initMemory() { 
     const e = ['🍎','🍎','🍌','🍌','🍇','🍇','🍉','🍉','🍓','🍓','🍒','🍒','🍍','🍍','🥝','🥝']; 
@@ -29,26 +29,22 @@ function initMemory() {
 }
 initMemory();
 
-// ⚡ NEW: Quick Draw State
+// ⚡ Quick Draw State
 let qdState = 'idle'; let qdTimeout = null;
 
-// 🎈 NEW: Pop Balloon State
+// 🎈 Pop Balloon State
 let balloonPumps = 0; let balloonPopped = false;
 let balloonThreshold = Math.floor(Math.random() * 15) + 5; 
 function resetBalloon() { balloonPumps = 0; balloonPopped = false; balloonThreshold = Math.floor(Math.random() * 15) + 5; }
 
 io.on('connection', (socket) => {
-    // Sync all states on load
     socket.emit('game update', gameState); socket.emit('c4 update', c4State); socket.emit('tap update', tapScore);
     socket.emit('plant update', plantLevel); socket.emit('love update', loveLevel); socket.emit('sleep update', partnerSleeping);
     socket.emit('locket update', locketImage); socket.emit('battery update', partnerBattery);
-    
-    // Sync New Games
     socket.emit('memory update', { board: memoryBoard, flipped: memoryFlipped, matched: memoryMatched });
     socket.emit('qd update', qdState);
     socket.emit('balloon update', { pumps: balloonPumps, popped: balloonPopped });
 
-    // System APIs
     socket.on('update battery', (batt) => { partnerBattery = batt; socket.broadcast.emit('battery update', partnerBattery); });
     socket.on('send buzz', () => { socket.broadcast.emit('receive buzz'); socket.broadcast.emit('notification', `📳 BUZZ! PAY ATTENTION!`); });
     socket.on('chat message', (data) => { socket.broadcast.emit('chat message', { text: data.text, sender: 'them' }); socket.broadcast.emit('notification', `💬 ${data.text}`); });
@@ -56,7 +52,6 @@ io.on('connection', (socket) => {
     socket.on('update locket', (imgData) => { locketImage = imgData; io.emit('locket update', locketImage); socket.broadcast.emit('notification', `🖼️ Updated the Locket!`); });
     socket.on('send heart', () => { io.emit('show heart'); socket.broadcast.emit('notification', `❤️ Sent you love!`); });
 
-    // Games
     socket.on('make move', (data) => { gameState[data.index] = data.symbol; io.emit('game update', gameState); });
     socket.on('reset game', () => { gameState = Array(9).fill(null); io.emit('game update', gameState); });
     socket.on('draw', (data) => socket.broadcast.emit('draw', data));
@@ -68,7 +63,6 @@ io.on('connection', (socket) => {
     socket.on('charge love', () => { if(loveLevel < 100) loveLevel += 5; if(loveLevel > 100) loveLevel = 100; io.emit('love update', loveLevel); });
     socket.on('toggle sleep', (status) => { partnerSleeping = status; socket.broadcast.emit('sleep update', partnerSleeping); let msg = status ? "😴 I'm sleeping!" : "☀️ I'm awake!"; socket.broadcast.emit('notification', msg); });
 
-    // 🧠 Memory Logic
     socket.on('mem flip', (idx) => {
         if(memoryMatched.includes(idx) || memoryFlipped.includes(idx)) return;
         if(memoryFlipped.length < 2) {
@@ -87,7 +81,6 @@ io.on('connection', (socket) => {
     });
     socket.on('mem reset', () => { initMemory(); io.emit('memory update', { board: memoryBoard, flipped: memoryFlipped, matched: memoryMatched }); });
 
-    // ⚡ Quick Draw Logic
     socket.on('qd start', () => {
         if(qdState !== 'idle') return;
         qdState = 'wait'; io.emit('qd update', qdState);
@@ -98,12 +91,16 @@ io.on('connection', (socket) => {
         else if (qdState === 'wait') { qdState = 'fail'; clearTimeout(qdTimeout); io.emit('qd update', qdState); setTimeout(() => { qdState = 'idle'; io.emit('qd update', qdState); }, 3000); }
     });
 
-    // 🎈 Balloon Logic
+    // 🎈 Balloon Logic FIX: Now tracks who popped it using socket.id!
     socket.on('balloon pump', () => {
         if(balloonPopped) return;
         balloonPumps++;
-        if(balloonPumps >= balloonThreshold) balloonPopped = true;
-        io.emit('balloon update', { pumps: balloonPumps, popped: balloonPopped });
+        if(balloonPumps >= balloonThreshold) {
+            balloonPopped = true;
+            io.emit('balloon update', { pumps: balloonPumps, popped: true, popper: socket.id });
+        } else {
+            io.emit('balloon update', { pumps: balloonPumps, popped: false });
+        }
     });
     socket.on('balloon reset', () => { resetBalloon(); io.emit('balloon update', { pumps: balloonPumps, popped: balloonPopped }); });
 });
