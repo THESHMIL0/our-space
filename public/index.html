@@ -11,15 +11,7 @@
         :root { --primary: #ff4757; --ios-blue: #007aff; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%); overflow: hidden; color: #333; height: 100vh; height: 100dvh; display: flex; flex-direction: column; padding-bottom: env(safe-area-inset-bottom); transition: transform 0.1s; }
         
-        /* 📳 SCREEN SHAKE ANIMATION */
-        @keyframes shake {
-            0% { transform: translate(2px, 2px) rotate(0deg); } 10% { transform: translate(-2px, -3px) rotate(-1deg); }
-            20% { transform: translate(-4px, 0px) rotate(1deg); } 30% { transform: translate(4px, 3px) rotate(0deg); }
-            40% { transform: translate(2px, -2px) rotate(1deg); } 50% { transform: translate(-2px, 3px) rotate(-1deg); }
-            60% { transform: translate(-4px, 2px) rotate(0deg); } 70% { transform: translate(4px, 2px) rotate(-1deg); }
-            80% { transform: translate(-2px, -2px) rotate(1deg); } 90% { transform: translate(2px, 3px) rotate(0deg); }
-            100% { transform: translate(2px, -3px) rotate(-1deg); }
-        }
+        @keyframes shake { 0% { transform: translate(2px, 2px) rotate(0deg); } 10% { transform: translate(-2px, -3px) rotate(-1deg); } 20% { transform: translate(-4px, 0px) rotate(1deg); } 30% { transform: translate(4px, 3px) rotate(0deg); } 40% { transform: translate(2px, -2px) rotate(1deg); } 50% { transform: translate(-2px, 3px) rotate(-1deg); } 60% { transform: translate(-4px, 2px) rotate(0deg); } 70% { transform: translate(4px, 2px) rotate(-1deg); } 80% { transform: translate(-2px, -2px) rotate(1deg); } 90% { transform: translate(2px, 3px) rotate(0deg); } 100% { transform: translate(2px, -3px) rotate(-1deg); } }
         .shake-screen { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
 
         #dynamic-island { position: fixed; top: max(12px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); width: 130px; height: 35px; background: black; border-radius: 30px; z-index: 100000; transition: 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: 600; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3); pointer-events: none; }
@@ -58,21 +50,11 @@
         
         .typing-bubble { display: flex; align-items: center; gap: 4px; padding: 15px 20px !important; }
         .typing-dot { width: 6px; height: 6px; background: #888; border-radius: 50%; animation: typingBounce 1.4s infinite ease-in-out both; }
-        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
-        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; } .typing-dot:nth-child(2) { animation-delay: -0.16s; }
         @keyframes typingBounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
 
         .input-area { padding: 15px; border-top: 1px solid #ccc; display: flex; gap: 10px; background: #f8f9fa; padding-bottom: calc(30px + env(safe-area-inset-bottom)); }
         .chat-input { flex: 1; padding: 12px 20px; border-radius: 25px; border: 1px solid #ddd; outline: none; background: #fff; font-size: 16px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.02); }
-        
-        .full-note-input { flex: 1; width: 100%; border: none; outline: none; resize: none; font-family: inherit; font-size: 18px; padding: 25px; background: #fffcf2; color: #333; line-height: 1.6; box-sizing: border-box; }
-        #list-container { flex: 1; padding: 20px; overflow-y: auto; background: white; }
-        .list-item { background: #f8f9fa; padding: 18px 20px; border-radius: 18px; margin-bottom: 12px; font-weight: 500; font-size: 16px; display: flex; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
-        .list-item::before { content: '✨'; margin-right: 12px; font-size: 20px; }
-
-        #snap-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 999999; display: none; flex-direction: column; }
-        #snap-image { flex: 1; width: 100%; object-fit: contain; }
-        #snap-timer-bar { height: 6px; background: var(--primary); width: 100%; border-radius: 0 0 10px 10px; }
 
         #ttt-status { font-size: 22px; font-weight: 800; color: #333; margin: 15px 0 5px 0; transition: 0.3s; }
         #ttt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 280px; margin: 15px auto 30px auto; }
@@ -107,9 +89,9 @@
     </div>
 
     <div style="text-align:center; padding: 5px 0 15px 0; font-weight:600; color:white; font-size: 14px; text-shadow:0 1px 5px rgba(0,0,0,0.3); opacity: 0.9;">
-        <span>Partner's Mood: <span id="partner-mood-display">😊</span></span>
-        <span style="margin: 0 10px;">|</span>
-        <span>Battery: <span id="partner-battery-display">100% 🔋</span></span>
+        <span>Mood: <span id="partner-mood-display">😊</span></span> <span style="margin: 0 5px;">|</span>
+        <span>Batt: <span id="partner-battery-display">100% 🔋</span></span> <span style="margin: 0 5px;">|</span>
+        <span>🎵 <span id="music-display">Silence 🤫</span></span>
     </div>
 
     <div id="home-screen">
@@ -119,14 +101,15 @@
             <input type="file" id="locket-input" accept="image/*" style="display:none;" onchange="sendLocket(event)">
         </div>
 
-        <div class="home-app" onclick="openApp('notesApp')"><div class="home-icon" style="background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);">📝</div><div class="app-label">Notes</div></div>
-        <div class="home-app" onclick="openApp('listApp')"><div class="home-icon" style="background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); color: white;">✅</div><div class="app-label">Bucket List</div></div>
-        <div class="home-app" onclick="document.getElementById('camera-input').click()"><div class="home-icon" style="background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%); color: white;">📸</div><div class="app-label">Camera</div></div>
+        <div class="home-app" onclick="openApp('musicApp')"><div class="home-icon" style="background: linear-gradient(135deg, #1db954 0%, #191414 100%); color:white;">🎵</div><div class="app-label">Music</div></div>
+        <div class="home-app" onclick="openApp('plantApp')"><div class="home-icon" style="background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%);">🪴</div><div class="app-label">Plant</div></div>
+        <div class="home-app" onclick="openApp('dateApp')"><div class="home-icon" style="background: linear-gradient(135deg, #ff0844 0%, #ffb199 100%); color:white;">🍿</div><div class="app-label">Date Night</div></div>
+        <div class="home-app" onclick="openApp('countApp')"><div class="home-icon" style="background: linear-gradient(135deg, #fccb90 0%, #d57eeb 100%); color:white;">⏳</div><div class="app-label">Timer</div></div>
+        
+        <div class="home-app" onclick="openApp('magicApp')"><div class="home-icon" style="background: linear-gradient(135deg, #434343 0%, #000000 100%); color:white;">🎱</div><div class="app-label">8-Ball</div></div>
         <div class="home-app" onclick="openApp('moodApp')"><div class="home-icon" style="background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);">🎭</div><div class="app-label">Mood</div></div>
         <div class="home-app" onclick="openGameApp('ttt', 'Tic-Tac-Toe')"><div class="home-icon" style="background: linear-gradient(135deg, #74ebd5 0%, #9face6 100%); color: white;">❌⭕</div><div class="app-label">Tic-Tac</div></div>
         <div class="home-app" onclick="openGameApp('draw', 'Drawing Canvas')"><div class="home-icon" style="background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);">🎨</div><div class="app-label">Draw</div></div>
-        <div class="home-app" onclick="openGameApp('tod', 'Truth or Dare')"><div class="home-icon" style="background: linear-gradient(135deg, #ff0844 0%, #ffb199 100%); color: white;">🎲</div><div class="app-label">Dare</div></div>
-        <div class="home-app" onclick="openGameApp('coin', 'Coin Flip')"><div class="home-icon" style="background: linear-gradient(135deg, #fccb90 0%, #d57eeb 100%);">🪙</div><div class="app-label">Coin</div></div>
     </div>
 
     <div id="dock">
@@ -135,21 +118,54 @@
         <div class="dock-icon" onclick="triggerHeart()" style="background: var(--primary); color: white;">❤️</div>
     </div>
 
-    <div id="moodApp" class="app-window">
-        <div class="app-header"><div style="width:40px;"></div><span class="app-title">Set Mood</span><span class="done-btn" onclick="closeApp('moodApp')">Done</span></div>
-        <div style="padding: 30px 20px; text-align: center;"><h3 style="color:#333; margin-bottom: 25px;">How are you feeling?</h3>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <button class="game-btn" onclick="setMood('Happy 😊')" style="margin:0; width:100%; background:#7bed9f; color:black;">Happy 😊</button>
-                <button class="game-btn" onclick="setMood('Miss You 🥺')" style="margin:0; width:100%; background:#ff7f50; color:white;">Miss You 🥺</button>
-                <button class="game-btn" onclick="setMood('Sleepy 😴')" style="margin:0; width:100%; background:#a4b0be; color:white;">Sleepy 😴</button>
-                <button class="game-btn" onclick="setMood('Busy 💻')" style="margin:0; width:100%; background:#ff4757; color:white;">Busy 💻</button>
-            </div>
+    <div id="musicApp" class="app-window">
+        <div class="app-header"><div style="width:40px;"></div><span class="app-title">Music Sync</span><span class="done-btn" onclick="closeApp('musicApp')">Done</span></div>
+        <div style="padding: 30px; text-align: center;">
+            <h3>What are you listening to? 🎧</h3>
+            <input id="song-input" class="chat-input" placeholder="e.g., Taylor Swift - Lover" style="width:90%; margin:20px 0;">
+            <button class="game-btn" style="background:#1db954;" onclick="setMusic()">Sync Status</button>
         </div>
     </div>
 
-    <div id="snap-overlay"><div id="snap-timer-bar"></div><img id="snap-image" src="" /><p style="color: white; text-align: center; font-weight: bold; margin-bottom: 30px;">Secret Snap (Disappearing in 10s)</p></div>
-    <div id="listApp" class="app-window"><div class="app-header"><div style="width:40px;"></div><span class="app-title">Bucket List</span><span class="done-btn" onclick="closeApp('listApp')">Done</span></div><div id="list-container"></div><div class="input-area"><input id="list-input" class="chat-input" placeholder="Add a dream..." autocomplete="off" /><button onclick="addListItem()" style="background:#a18cd1; color:white; border:none; border-radius:50%; width:40px; height:40px; font-size:20px;">+</button></div><button class="game-btn" style="background: #ff4757; width: 90%; margin-bottom: 30px;" onclick="clearList()">Clear Finished List</button></div>
-    <div id="notesApp" class="app-window"><div class="app-header"><div style="width:40px;"></div><span class="app-title">Shared Notes</span><span class="done-btn" onclick="closeApp('notesApp')">Done</span></div><textarea id="app-note" class="full-note-input" oninput="sendNote()" placeholder="Type something sweet here..."></textarea></div>
+    <div id="plantApp" class="app-window">
+        <div class="app-header"><div style="width:40px;"></div><span class="app-title">Our Plant</span><span class="done-btn" onclick="closeApp('plantApp')">Done</span></div>
+        <div style="padding: 40px 20px; text-align: center;">
+            <div id="plant-emoji" style="font-size: 100px; margin-bottom: 20px; transition: 0.3s;">🌱</div>
+            <h2 style="color:#2ed573;">Level: <span id="plant-level-text">0</span></h2>
+            <p style="color:#666;">Water the plant together to make it grow!</p>
+            <button class="game-btn" style="background:#1e90ff; font-size:20px; padding: 20px 40px;" onclick="waterPlant()">Water 💧</button>
+        </div>
+    </div>
+
+    <div id="dateApp" class="app-window">
+        <div class="app-header"><div style="width:40px;"></div><span class="app-title">Date Roulette</span><span class="done-btn" onclick="closeApp('dateApp')">Done</span></div>
+        <div style="padding: 40px 20px; text-align: center;">
+            <h1 style="font-size: 50px; margin:0;">🎲</h1>
+            <h3 style="color:#333; margin: 20px 0;">Can't decide on date night?</h3>
+            <button class="game-btn" style="background:#ff4757; font-size:18px;" onclick="spinDate()">Spin the Wheel!</button>
+        </div>
+    </div>
+
+    <div id="countApp" class="app-window">
+        <div class="app-header"><div style="width:40px;"></div><span class="app-title">Countdown</span><span class="done-btn" onclick="closeApp('countApp')">Done</span></div>
+        <div style="padding: 40px 20px; text-align: center;">
+            <h1 id="countdown-display" style="font-size: 60px; color: var(--primary); margin:0;">0</h1>
+            <h3 style="color:#666; margin-top:0;">Days Left</h3>
+            <input type="date" id="date-input" class="chat-input" style="width:80%; margin:30px 0;">
+            <button class="game-btn" onclick="setCountdown()">Set Target Date</button>
+        </div>
+    </div>
+
+    <div id="magicApp" class="app-window">
+        <div class="app-header"><div style="width:40px;"></div><span class="app-title">Magic 8-Ball</span><span class="done-btn" onclick="closeApp('magicApp')">Done</span></div>
+        <div style="padding: 40px 20px; text-align: center;">
+            <div style="font-size: 80px; margin-bottom: 20px;">🎱</div>
+            <input id="eightball-input" class="chat-input" placeholder="Ask a yes/no question..." style="width:90%; margin-bottom: 20px;">
+            <button class="game-btn" onclick="shake8Ball()">Shake & Send!</button>
+        </div>
+    </div>
+
+    <div id="moodApp" class="app-window"><div class="app-header"><div style="width:40px;"></div><span class="app-title">Set Mood</span><span class="done-btn" onclick="closeApp('moodApp')">Done</span></div><div style="padding: 30px 20px; text-align: center;"><h3 style="color:#333; margin-bottom: 25px;">How are you feeling?</h3><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;"><button class="game-btn" onclick="setMood('Happy 😊')" style="margin:0; width:100%; background:#7bed9f; color:black;">Happy 😊</button><button class="game-btn" onclick="setMood('Miss You 🥺')" style="margin:0; width:100%; background:#ff7f50; color:white;">Miss You 🥺</button><button class="game-btn" onclick="setMood('Sleepy 😴')" style="margin:0; width:100%; background:#a4b0be; color:white;">Sleepy 😴</button><button class="game-btn" onclick="setMood('Busy 💻')" style="margin:0; width:100%; background:#ff4757; color:white;">Busy 💻</button></div></div></div>
     
     <div id="messageApp" class="app-window">
         <div class="app-header"><div style="width:40px;"></div><span class="app-title">Messages</span><span class="done-btn" onclick="closeApp('messageApp')">Done</span></div>
@@ -170,8 +186,6 @@
                 <canvas id="draw-board" width="280" height="280"></canvas>
                 <button class="game-btn" style="background: #ff9f43;" onclick="clearCanvas()">Erase Canvas</button>
             </div>
-            <div id="screen-tod" style="display:none; padding: 30px;"><h3>Truth or Dare</h3><button class="game-btn" style="background: #ff4757;" onclick="playToD()">Spin the Wheel 🎲</button></div>
-            <div id="screen-coin" style="display:none; padding: 30px;"><h3>Coin Flip</h3><button class="game-btn" style="background: #eccc68; color: black;" onclick="flipCoin()">Flip a Coin 🪙</button></div>
         </div>
         <div id="mini-chat" class="chat-container" style="background: #f2f2f7; padding: 10px; flex: 1;"></div>
         <div class="input-area" style="padding: 10px; background:white;"><input id="mini-input" class="chat-input" placeholder="Trash talk..." autocomplete="off" oninput="handleTyping()" /><button onclick="sendMessage('mini-input')" style="background:#2ed573; color:white; border:none; border-radius:50%; width:40px; height:40px; font-weight:bold;">↑</button></div>
@@ -186,7 +200,7 @@
         function closeApp(id) { document.getElementById(id).style.display = 'none'; }
         function openGameApp(gameId, title) {
             document.getElementById('game-title').innerText = title;
-            ['ttt', 'draw', 'tod', 'coin'].forEach(id => document.getElementById('screen-' + id).style.display = 'none');
+            ['ttt', 'draw'].forEach(id => document.getElementById('screen-' + id).style.display = 'none');
             document.getElementById('screen-' + gameId).style.display = 'block'; openApp('gamesApp');
         }
 
@@ -196,81 +210,76 @@
             setTimeout(() => { island.classList.remove('island-active'); }, 4000);
         });
 
-        // --- 🔋 LIVE BATTERY LOGIC ---
-        // Checks if the phone browser supports reading the battery
-        if ('getBattery' in navigator) {
-            navigator.getBattery().then(function(battery) {
-                function updateBattery() {
-                    let level = Math.round(battery.level * 100) + "%";
-                    let icon = battery.charging ? "⚡" : "🔋";
-                    socket.emit('update battery', level + " " + icon);
-                }
-                updateBattery(); // Send on load
-                battery.addEventListener('levelchange', updateBattery);
-                battery.addEventListener('chargingchange', updateBattery);
-            });
-        }
-        
-        socket.on('battery update', (batt) => {
-            document.getElementById('partner-battery-display').innerText = batt;
-        });
-
-        // --- 📳 BUZZ (SCREEN SHAKE) LOGIC ---
+        // Battery & Buzz & Locket & Mood
+        if ('getBattery' in navigator) { navigator.getBattery().then(function(battery) { function updateBattery() { let level = Math.round(battery.level * 100) + "%"; let icon = battery.charging ? "⚡" : "🔋"; socket.emit('update battery', level + " " + icon); } updateBattery(); battery.addEventListener('levelchange', updateBattery); battery.addEventListener('chargingchange', updateBattery); }); }
+        socket.on('battery update', (batt) => { document.getElementById('partner-battery-display').innerText = batt; });
         function triggerBuzz() { socket.emit('send buzz'); }
-        socket.on('receive buzz', () => {
-            // Aggressive vibration if supported
-            if (navigator.vibrate) navigator.vibrate([500, 200, 500]);
-            // Shake the entire screen!
-            document.body.classList.add('shake-screen');
-            setTimeout(() => { document.body.classList.remove('shake-screen'); }, 500);
-        });
-
+        socket.on('receive buzz', () => { if (navigator.vibrate) navigator.vibrate([500, 200, 500]); document.body.classList.add('shake-screen'); setTimeout(() => { document.body.classList.remove('shake-screen'); }, 500); });
         function sendLocket(event) { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(e) { socket.emit('update locket', e.target.result); }; reader.readAsDataURL(file); }
         socket.on('locket update', (imgData) => { const imgEl = document.getElementById('locket-display'); if(imgData) { imgEl.src = imgData; imgEl.style.display = 'block'; } });
         function setMood(mood) { socket.emit('set mood', mood); closeApp('moodApp'); }
         socket.on('mood update', mood => { document.getElementById('partner-mood-display').innerText = mood; });
-        
-        function sendSnap(event) { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(e) { socket.emit('send snap', e.target.result); }; reader.readAsDataURL(file); }
-        socket.on('receive snap', (imgData) => {
-            const overlay = document.getElementById('snap-overlay'); const img = document.getElementById('snap-image'); const timerBar = document.getElementById('snap-timer-bar');
-            img.src = imgData; overlay.style.display = 'flex'; timerBar.style.transition = 'none'; timerBar.style.width = '100%';
-            setTimeout(() => { timerBar.style.transition = 'width 10s linear'; timerBar.style.width = '0%'; }, 50);
-            setTimeout(() => { overlay.style.display = 'none'; img.src = ""; }, 10000);
+
+        // --- 🎵 MUSIC APP ---
+        function setMusic() { const song = document.getElementById('song-input').value; if(song) { socket.emit('set music', song); document.getElementById('song-input').value = ""; closeApp('musicApp'); } }
+        socket.on('music update', song => { document.getElementById('music-display').innerText = song; });
+
+        // --- 🪴 PLANT APP ---
+        function waterPlant() { socket.emit('water plant'); }
+        socket.on('plant update', level => {
+            document.getElementById('plant-level-text').innerText = level;
+            let emoji = "🌱";
+            if(level > 10) emoji = "🌿";
+            if(level > 30) emoji = "🪴";
+            if(level > 60) emoji = "🌸";
+            if(level > 100) emoji = "🌳";
+            document.getElementById('plant-emoji').innerText = emoji;
+            // Little bounce animation
+            let p = document.getElementById('plant-emoji');
+            p.style.transform = "scale(1.2)"; setTimeout(() => p.style.transform = "scale(1)", 200);
         });
 
-        function addListItem() { var input = document.getElementById('list-input'); if(input.value) { socket.emit('add item', input.value); input.value = ''; } }
-        function clearList() { socket.emit('clear list'); }
-        socket.on('list update', list => { const container = document.getElementById('list-container'); container.innerHTML = ''; list.forEach(item => { let div = document.createElement('div'); div.className = 'list-item'; div.innerText = item; container.appendChild(div); }); });
+        // --- ⏳ COUNTDOWN APP ---
+        function setCountdown() { const date = document.getElementById('date-input').value; if(date) { socket.emit('set countdown', date); closeApp('countApp'); } }
+        socket.on('countdown update', targetDate => {
+            setInterval(() => {
+                const diff = new Date(targetDate) - new Date();
+                const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+                document.getElementById('countdown-display').innerText = days > 0 ? days : 0;
+            }, 1000);
+        });
 
-        const noteBox = document.getElementById('app-note'); function sendNote() { socket.emit('update note', noteBox.value); }
-        socket.on('note update', text => { if(document.activeElement !== noteBox) noteBox.value = text; });
-
-        function addMessageToBoth(text, type) { 
-            const now = new Date(); let hours = now.getHours(); let ampm = hours >= 12 ? 'PM' : 'AM'; hours = hours % 12 || 12; let mins = now.getMinutes() < 10 ? '0' + now.getMinutes() : now.getMinutes(); let timeStr = hours + ':' + mins + ' ' + ampm;
-            const createBubble = () => { var div = document.createElement('div'); div.className = 'bubble ' + type; div.innerHTML = text + `<span class="msg-time">${timeStr}</span>`; return div; }; 
-            let mainChat = document.getElementById('main-chat'); mainChat.appendChild(createBubble()); mainChat.scrollTop = mainChat.scrollHeight; let miniChat = document.getElementById('mini-chat'); miniChat.appendChild(createBubble()); miniChat.scrollTop = miniChat.scrollHeight; 
-            let typingBubbles = document.querySelectorAll('.typing-bubble-container'); typingBubbles.forEach(b => b.remove());
+        // --- 🍿 DATE ROULETTE ---
+        const dinners = ["Sushi 🍣", "Italian 🍝", "Burgers 🍔", "Tacos 🌮", "Cook Together 🍳"];
+        const activities = ["Netflix Movie 🍿", "Board Games 🎲", "Late Night Walk 🌙", "Deep Talk 🗣️", "Video Games 🎮"];
+        function spinDate() {
+            let d = dinners[Math.floor(Math.random() * dinners.length)];
+            let a = activities[Math.floor(Math.random() * activities.length)];
+            let msg = `🎲 **Date Night Pick!**\n🍽️ Dinner: ${d}\n🎬 Activity: ${a}`;
+            addMessageToBoth(msg, 'me'); socket.emit('chat message', {text: msg}); closeApp('dateApp');
         }
 
+        // --- 🎱 MAGIC 8-BALL ---
+        const answers = ["Yes, definitely! ✨", "No way. 🙅", "Ask again later ⏳", "It is certain 💯", "Very doubtful 😬", "Absolutely! ❤️"];
+        function shake8Ball() {
+            let q = document.getElementById('eightball-input').value; if(!q) return;
+            let a = answers[Math.floor(Math.random() * answers.length)];
+            let msg = `🎱 **Question:** ${q}\n✨ **Answer:** ${a}`;
+            addMessageToBoth(msg, 'me'); socket.emit('chat message', {text: msg});
+            document.getElementById('eightball-input').value = ""; closeApp('magicApp');
+        }
+
+        // --- CHAT & GAMES (Retained) ---
+        function addMessageToBoth(text, type) { const now = new Date(); let hours = now.getHours(); let ampm = hours >= 12 ? 'PM' : 'AM'; hours = hours % 12 || 12; let mins = now.getMinutes() < 10 ? '0' + now.getMinutes() : now.getMinutes(); let timeStr = hours + ':' + mins + ' ' + ampm; const createBubble = () => { var div = document.createElement('div'); div.className = 'bubble ' + type; div.innerHTML = text + `<span class="msg-time">${timeStr}</span>`; return div; }; let mainChat = document.getElementById('main-chat'); mainChat.appendChild(createBubble()); mainChat.scrollTop = mainChat.scrollHeight; let miniChat = document.getElementById('mini-chat'); miniChat.appendChild(createBubble()); miniChat.scrollTop = miniChat.scrollHeight; let typingBubbles = document.querySelectorAll('.typing-bubble-container'); typingBubbles.forEach(b => b.remove()); }
         function sendMessage(inputId) { var inputField = document.getElementById(inputId); if(inputField.value) { addMessageToBoth(inputField.value, 'me'); socket.emit('chat message', {text: inputField.value}); inputField.value = ''; socket.emit('stop typing'); } }
         socket.on('chat message', d => addMessageToBoth(d.text, 'them'));
-
         let typingTimer; function handleTyping() { socket.emit('typing'); clearTimeout(typingTimer); typingTimer = setTimeout(() => socket.emit('stop typing'), 1500); }
         socket.on('typing', () => { if (!document.getElementById('typing-indicator')) { let div = document.createElement('div'); div.id = 'typing-indicator'; div.className = 'bubble them typing-bubble typing-bubble-container'; div.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>'; let mainChat = document.getElementById('main-chat'); mainChat.appendChild(div); mainChat.scrollTop = mainChat.scrollHeight; } });
         socket.on('stop typing', () => { let indicator = document.getElementById('typing-indicator'); if (indicator) indicator.remove(); });
-
-        let currentTurn = 'X'; let localGameState = Array(9).fill(null); let gameActive = true;
-        function makeMove(idx) { if (localGameState[idx] || !gameActive) return; socket.emit('make move', { index: idx, symbol: currentTurn }); }
-        socket.on('game update', state => { localGameState = state; const cells = document.querySelectorAll('#ttt-grid .cell'); let xCount = 0; let oCount = 0; cells.forEach(c => c.classList.remove('winning-cell')); state.forEach((val, i) => { cells[i].innerText = val || ''; if (val === 'X') xCount++; if (val === 'O') oCount++; cells[i].style.color = val === 'X' ? '#ff4757' : '#2ed573'; }); currentTurn = (xCount > oCount) ? 'O' : 'X'; document.getElementById('ttt-status').innerText = `${currentTurn}'s Turn`; checkWinAndDraw(state); });
-        function checkWinAndDraw(state) { const winConditions = [ [0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6] ]; let roundWon = false; for (let i = 0; i < winConditions.length; i++) { const winCondition = winConditions[i]; let a = state[winCondition[0]], b = state[winCondition[1]], c = state[winCondition[2]]; if (a === null || b === null || c === null) continue; if (a === b && b === c) { roundWon = true; document.querySelectorAll('#ttt-grid .cell')[winCondition[0]].classList.add('winning-cell'); document.querySelectorAll('#ttt-grid .cell')[winCondition[1]].classList.add('winning-cell'); document.querySelectorAll('#ttt-grid .cell')[winCondition[2]].classList.add('winning-cell'); document.getElementById('ttt-status').innerText = `🎉 ${a} Wins! 🎉`; document.getElementById('ttt-status').style.color = a === 'X' ? '#ff4757' : '#2ed573'; gameActive = false; break; } } if (!roundWon && !state.includes(null)) { document.getElementById('ttt-status').innerText = `It's a Draw! 🤝`; document.getElementById('ttt-status').style.color = '#333'; gameActive = false; } else if (!roundWon) { gameActive = true; document.getElementById('ttt-status').style.color = '#333'; } }
-        function resetGame() { socket.emit('reset game'); }
-        const prompts = ["Truth: First impression of me?", "Dare: Send a silly selfie!", "Truth: Favorite memory?", "Dare: Emoji only for 5 mins!", "Truth: A secret you haven't told me?", "Dare: I pick dinner tonight!"];
-        function playToD() { let msg = "🎲 " + prompts[Math.floor(Math.random() * prompts.length)]; addMessageToBoth(msg, 'me'); socket.emit('chat message', {text: msg}); }
-        function flipCoin() { let msg = "🪙 Flipped a coin: **" + (Math.random() < 0.5 ? "Heads" : "Tails") + "**!"; addMessageToBoth(msg, 'me'); socket.emit('chat message', {text: msg}); }
-        
         function triggerHeart() { socket.emit('send heart'); }
         socket.on('show heart', () => { const heart = document.createElement('div'); heart.innerText = '❤️'; heart.className = 'floating-heart'; heart.style.left = Math.random() * 80 + 10 + 'vw'; document.body.appendChild(heart); setTimeout(() => heart.remove(), 3000); });
 
+        let currentTurn = 'X'; let localGameState = Array(9).fill(null); let gameActive = true; function makeMove(idx) { if (localGameState[idx] || !gameActive) return; socket.emit('make move', { index: idx, symbol: currentTurn }); } socket.on('game update', state => { localGameState = state; const cells = document.querySelectorAll('#ttt-grid .cell'); let xCount = 0; let oCount = 0; cells.forEach(c => c.classList.remove('winning-cell')); state.forEach((val, i) => { cells[i].innerText = val || ''; if (val === 'X') xCount++; if (val === 'O') oCount++; cells[i].style.color = val === 'X' ? '#ff4757' : '#2ed573'; }); currentTurn = (xCount > oCount) ? 'O' : 'X'; document.getElementById('ttt-status').innerText = `${currentTurn}'s Turn`; checkWinAndDraw(state); }); function checkWinAndDraw(state) { const winConditions = [ [0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6] ]; let roundWon = false; for (let i = 0; i < winConditions.length; i++) { const winCondition = winConditions[i]; let a = state[winCondition[0]], b = state[winCondition[1]], c = state[winCondition[2]]; if (a === null || b === null || c === null) continue; if (a === b && b === c) { roundWon = true; document.querySelectorAll('#ttt-grid .cell')[winCondition[0]].classList.add('winning-cell'); document.querySelectorAll('#ttt-grid .cell')[winCondition[1]].classList.add('winning-cell'); document.querySelectorAll('#ttt-grid .cell')[winCondition[2]].classList.add('winning-cell'); document.getElementById('ttt-status').innerText = `🎉 ${a} Wins! 🎉`; document.getElementById('ttt-status').style.color = a === 'X' ? '#ff4757' : '#2ed573'; gameActive = false; break; } } if (!roundWon && !state.includes(null)) { document.getElementById('ttt-status').innerText = `It's a Draw! 🤝`; document.getElementById('ttt-status').style.color = '#333'; gameActive = false; } else if (!roundWon) { gameActive = true; document.getElementById('ttt-status').style.color = '#333'; } } function resetGame() { socket.emit('reset game'); }
         const canvas = document.getElementById('draw-board'); const ctx = canvas.getContext('2d'); ctx.lineCap = 'round'; ctx.lineJoin = 'round'; let drawing = false; let brushColor = '#ff4757'; let brushSize = 4; function setBrush(color) { brushColor = color; } function updateSize(size) { brushSize = size; } function getPos(e) { const rect = canvas.getBoundingClientRect(); return { x: (e.touches ? e.touches[0].clientX : e.clientX) - rect.left, y: (e.touches ? e.touches[0].clientY : e.clientY) - rect.top }; } function startDraw(e) { drawing = true; const pos = getPos(e); socket.emit('draw', { type: 'start', x: pos.x, y: pos.y, color: brushColor, size: brushSize }); ctx.beginPath(); ctx.strokeStyle = brushColor; ctx.lineWidth = brushSize; ctx.moveTo(pos.x, pos.y); e.preventDefault(); } function drawLine(e) { if (!drawing) return; const pos = getPos(e); socket.emit('draw', { type: 'draw', x: pos.x, y: pos.y, color: brushColor, size: brushSize }); ctx.strokeStyle = brushColor; ctx.lineWidth = brushSize; ctx.lineTo(pos.x, pos.y); ctx.stroke(); e.preventDefault(); } function stopDraw() { drawing = false; ctx.beginPath(); } canvas.addEventListener('mousedown', startDraw); canvas.addEventListener('mousemove', drawLine); canvas.addEventListener('mouseup', stopDraw); canvas.addEventListener('touchstart', startDraw, {passive: false}); canvas.addEventListener('touchmove', drawLine, {passive: false}); canvas.addEventListener('touchend', stopDraw); socket.on('draw', data => { if (data.type === 'start') { ctx.beginPath(); ctx.strokeStyle = data.color || '#ff4757'; ctx.lineWidth = data.size || 4; ctx.moveTo(data.x, data.y); } else if (data.type === 'draw') { ctx.strokeStyle = data.color || '#ff4757'; ctx.lineWidth = data.size || 4; ctx.lineTo(data.x, data.y); ctx.stroke(); } else if (data.type === 'clear') { ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.beginPath(); } }); function clearCanvas() { socket.emit('draw', { type: 'clear' }); ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.beginPath(); }
     </script>
 </body>
