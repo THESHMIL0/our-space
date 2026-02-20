@@ -12,9 +12,12 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
 let gameState = Array(9).fill(null);
+let sharedNote = "Type a sweet note here... 📝"; // Memory for the sticky note
 
 io.on('connection', (socket) => {
+    // Send current states when they open the app
     socket.emit('game update', gameState);
+    socket.emit('note update', sharedNote);
 
     // Chat
     socket.on('chat message', (data) => {
@@ -32,14 +35,20 @@ io.on('connection', (socket) => {
         io.emit('game update', gameState);
     });
 
-    // --- NEW: Live Drawing ---
+    // Live Drawing
     socket.on('draw', (data) => {
-        socket.broadcast.emit('draw', data); // Bounces the drawing coordinates to partner
+        socket.broadcast.emit('draw', data); 
     });
 
-    // --- NEW: Floating Hearts ---
+    // Floating Hearts
     socket.on('send heart', () => {
-        io.emit('show heart'); // Tells BOTH screens to spawn a heart
+        io.emit('show heart'); 
+    });
+
+    // Shared Sticky Note Widget
+    socket.on('update note', (text) => {
+        sharedNote = text;
+        socket.broadcast.emit('note update', sharedNote);
     });
 });
 
