@@ -14,7 +14,6 @@
         #dashboard-header { padding: 60px 20px 40px; text-align: center; background: white; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         #counter-days { font-size: 56px; font-weight: 800; color: var(--primary); margin: 0; }
         
-        /* Centered 2-column grid for the icons */
         #home-screen { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; padding: 50px 30px; }
         .app-card { background: white; padding: 35px 10px; border-radius: 24px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer; transition: 0.2s; }
         .app-card:active { transform: scale(0.95); }
@@ -22,20 +21,26 @@
         .app-window { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: none; flex-direction: column; z-index: 100; }
         .app-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; font-weight: bold; }
         
-        #messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+        /* Universal Chat Styles */
+        .chat-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
         .bubble { max-width: 75%; padding: 12px 16px; border-radius: 20px; font-size: 15px; }
         .me { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 4px; }
         .them { align-self: flex-start; background: #e9e9eb; color: black; border-bottom-left-radius: 4px; }
-        
         .input-area { padding: 15px; border-top: 1px solid #eee; display: flex; gap: 10px; background: white; padding-bottom: 30px; }
-        #m { flex: 1; padding: 12px; border-radius: 25px; border: 1px solid #eee; outline: none; background: #f1f2f6; }
+        .chat-input { flex: 1; padding: 12px; border-radius: 25px; border: 1px solid #eee; outline: none; background: #f1f2f6; }
         
-        #ttt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 280px; margin: 40px auto; }
-        .cell { width: 85px; height: 85px; background: #f1f2f6; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: bold; cursor: pointer;}
+        /* Game Specific Styles */
+        .game-nav { display: flex; background: #f1f2f6; padding: 5px; border-radius: 20px; margin: 15px; }
+        .game-nav button { flex: 1; padding: 10px; border: none; background: transparent; border-radius: 15px; font-weight: bold; cursor: pointer; color: #555; }
+        .game-nav button.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        
+        #ttt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 250px; margin: 20px auto; }
+        .cell { width: 75px; height: 75px; background: #f1f2f6; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 35px; font-weight: bold; cursor: pointer;}
+        
+        .game-btn { display:block; margin: 15px auto; padding: 15px 30px; border-radius: 25px; border: none; background: #2f3542; color: white; font-weight: bold; font-size: 16px; cursor: pointer;}
     </style>
 </head>
 <body>
-    <script>if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/sw.js'); }</script>
 
     <div id="dashboard-header">
         <p id="counter-days">0</p>
@@ -53,81 +58,160 @@
 
     <div id="messageApp" class="app-window">
         <div class="app-header"><span>My Love</span><span style="color:var(--primary); cursor:pointer;" onclick="closeApp('messageApp')">Close</span></div>
-        <div id="messages"></div>
+        <div id="main-chat" class="chat-container"></div>
         <div class="input-area">
-            <input id="m" placeholder="iMessage" autocomplete="off" />
-            <button onclick="sendMessage()" style="background:var(--primary); color:white; border:none; border-radius:50%; width:40px; height:40px;">↑</button>
+            <input id="main-input" class="chat-input" placeholder="Message..." autocomplete="off" />
+            <button onclick="sendMessage('main-input')" style="background:var(--primary); color:white; border:none; border-radius:50%; width:40px; height:40px;">↑</button>
         </div>
     </div>
 
     <div id="gamesApp" class="app-window">
-        <div class="app-header"><span>Tic-Tac-Toe</span><span style="color:var(--primary); cursor:pointer;" onclick="closeApp('gamesApp')">Quit</span></div>
-        <div id="ttt-grid">
-            <div class="cell" onclick="makeMove(0)"></div><div class="cell" onclick="makeMove(1)"></div><div class="cell" onclick="makeMove(2)"></div>
-            <div class="cell" onclick="makeMove(3)"></div><div class="cell" onclick="makeMove(4)"></div><div class="cell" onclick="makeMove(5)"></div>
-            <div class="cell" onclick="makeMove(6)"></div><div class="cell" onclick="makeMove(7)"></div><div class="cell" onclick="makeMove(8)"></div>
+        <div class="app-header"><span>Game Room</span><span style="color:var(--primary); cursor:pointer;" onclick="closeApp('gamesApp')">Quit</span></div>
+        
+        <div class="game-nav">
+            <button id="tab-ttt" class="active" onclick="showGame('ttt')">Tic-Tac-Toe</button>
+            <button id="tab-tod" onclick="showGame('tod')">Truth/Dare</button>
+            <button id="tab-coin" onclick="showGame('coin')">Coin Flip</button>
         </div>
-        <button onclick="resetGame()" style="display:block; margin:0 auto; padding:12px 25px; border-radius:25px; border:none; background:#2f3542; color:white; font-weight:bold;">Restart Game</button>
+
+        <div id="game-screens" style="padding: 10px; text-align: center; border-bottom: 1px solid #eee; padding-bottom: 20px;">
+            
+            <div id="screen-ttt">
+                <div id="ttt-grid">
+                    <div class="cell" onclick="makeMove(0)"></div><div class="cell" onclick="makeMove(1)"></div><div class="cell" onclick="makeMove(2)"></div>
+                    <div class="cell" onclick="makeMove(3)"></div><div class="cell" onclick="makeMove(4)"></div><div class="cell" onclick="makeMove(5)"></div>
+                    <div class="cell" onclick="makeMove(6)"></div><div class="cell" onclick="makeMove(7)"></div><div class="cell" onclick="makeMove(8)"></div>
+                </div>
+                <button class="game-btn" onclick="resetGame()">Restart Board</button>
+            </div>
+
+            <div id="screen-tod" style="display:none; padding: 20px;">
+                <h3 style="margin-bottom: 5px;">Truth or Dare</h3>
+                <p style="color: #666; font-size: 14px; margin-bottom: 20px;">Tap to generate a prompt and send it to the chat!</p>
+                <button class="game-btn" style="background: #ff4757;" onclick="playToD()">Spin the Wheel 🎲</button>
+            </div>
+
+            <div id="screen-coin" style="display:none; padding: 20px;">
+                <h3 style="margin-bottom: 5px;">Coin Flip</h3>
+                <p style="color: #666; font-size: 14px; margin-bottom: 20px;">Can't decide on dinner?</p>
+                <button class="game-btn" style="background: #eccc68; color: black;" onclick="flipCoin()">Flip a Coin 🪙</button>
+            </div>
+        </div>
+
+        <div id="mini-chat" class="chat-container" style="background: #fafafa; padding: 10px; flex: 1;"></div>
+        <div class="input-area" style="padding: 10px;">
+            <input id="mini-input" class="chat-input" placeholder="Trash talk..." autocomplete="off" />
+            <button onclick="sendMessage('mini-input')" style="background:#2ed573; color:white; border:none; border-radius:50%; width:40px; height:40px;">↑</button>
+        </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         var socket = io();
         
-        // 1. UPDATE YOUR DATE HERE! (Format: YYYY-MM-DD)
+        // 1. RELATIONSHIP COUNTER (Format: YYYY-MM-DD)
         const startDate = new Date("2024-01-01"); 
-        
         function updateCounter() {
             const diff = Math.floor((new Date() - startDate) / (1000 * 60 * 60 * 24));
             document.getElementById('counter-days').innerText = diff;
         }
         updateCounter();
 
+        // APP NAVIGATION
         function openApp(id) { document.getElementById(id).style.display = 'flex'; }
         function closeApp(id) { document.getElementById(id).style.display = 'none'; }
 
-        // --- CHAT ---
-        function addMessage(text, type) {
-            var div = document.createElement('div');
-            div.className = 'bubble ' + type;
-            div.textContent = text;
-            document.getElementById('messages').appendChild(div);
-            document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+        // --- UNIFIED CHAT SYSTEM ---
+        // This function adds the bubble to BOTH chat screens automatically!
+        function addMessageToBoth(text, type) {
+            const createBubble = () => {
+                var div = document.createElement('div');
+                div.className = 'bubble ' + type;
+                div.textContent = text;
+                return div;
+            };
+            
+            // Add to Main Chat
+            let mainChat = document.getElementById('main-chat');
+            mainChat.appendChild(createBubble());
+            mainChat.scrollTop = mainChat.scrollHeight;
+
+            // Add to Mini Game Chat
+            let miniChat = document.getElementById('mini-chat');
+            miniChat.appendChild(createBubble());
+            miniChat.scrollTop = miniChat.scrollHeight;
         }
 
-        function sendMessage() {
-            var i = document.getElementById('m');
-            if(i.value) {
-                addMessage(i.value, 'me');
-                socket.emit('chat message', {text: i.value});
-                i.value = '';
+        // Works for both the main input and the game input
+        function sendMessage(inputId) {
+            var inputField = document.getElementById(inputId);
+            if(inputField.value) {
+                let msgText = inputField.value;
+                addMessageToBoth(msgText, 'me'); // Show locally
+                socket.emit('chat message', {text: msgText}); // Send to partner
+                inputField.value = '';
             }
         }
-        socket.on('chat message', d => addMessage(d.text, 'them'));
+        
+        socket.on('chat message', d => addMessageToBoth(d.text, 'them'));
+
+        // --- GAME MENU LOGIC ---
+        function showGame(gameId) {
+            // Hide all
+            document.getElementById('screen-ttt').style.display = 'none';
+            document.getElementById('screen-tod').style.display = 'none';
+            document.getElementById('screen-coin').style.display = 'none';
+            document.getElementById('tab-ttt').className = '';
+            document.getElementById('tab-tod').className = '';
+            document.getElementById('tab-coin').className = '';
+            
+            // Show selected
+            document.getElementById('screen-' + gameId).style.display = 'block';
+            document.getElementById('tab-' + gameId).className = 'active';
+        }
 
         // --- TIC TAC TOE ---
-        let currentTurn = 'X'; // Automatically switches between X and O
-        
-        function makeMove(idx) { 
-            socket.emit('make move', { index: idx, symbol: currentTurn }); 
-        }
+        let currentTurn = 'X'; 
+        function makeMove(idx) { socket.emit('make move', { index: idx, symbol: currentTurn }); }
         
         socket.on('game update', state => {
             const cells = document.querySelectorAll('.cell');
             let xCount = 0; let oCount = 0;
-            
             state.forEach((val, i) => { 
                 cells[i].innerText = val || ''; 
                 if (val === 'X') xCount++;
                 if (val === 'O') oCount++;
                 cells[i].style.color = val === 'X' ? '#ff4757' : '#2ed573';
             });
-            
-            // Logic to switch turns automatically
             currentTurn = (xCount > oCount) ? 'O' : 'X';
         });
         
         function resetGame() { socket.emit('reset game'); }
+
+        // --- TRUTH OR DARE ---
+        const prompts = [
+            "Truth: What was your first impression of me?",
+            "Dare: Send the silliest selfie you can take right now.",
+            "Truth: What is your favorite memory of us?",
+            "Dare: Type your next 3 messages using only emojis.",
+            "Truth: What is one secret you've never told me?",
+            "Dare: Let me pick what we eat next time we go out!"
+        ];
+        
+        function playToD() {
+            let randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
+            let msg = "🎲 " + randomPrompt;
+            addMessageToBoth(msg, 'me');
+            socket.emit('chat message', {text: msg});
+        }
+
+        // --- COIN FLIP ---
+        function flipCoin() {
+            let result = Math.random() < 0.5 ? "Heads" : "Tails";
+            let msg = "🪙 I flipped a coin and got: **" + result + "**!";
+            addMessageToBoth(msg, 'me');
+            socket.emit('chat message', {text: msg});
+        }
     </script>
 </body>
 </html>
