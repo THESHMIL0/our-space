@@ -13,6 +13,22 @@
         
         @keyframes shake { 0% { transform: translate(2px, 2px) rotate(0deg); } 10% { transform: translate(-2px, -3px) rotate(-1deg); } 20% { transform: translate(-4px, 0px) rotate(1deg); } 30% { transform: translate(4px, 3px) rotate(0deg); } 40% { transform: translate(2px, -2px) rotate(1deg); } 50% { transform: translate(-2px, 3px) rotate(-1deg); } 60% { transform: translate(-4px, 2px) rotate(0deg); } 70% { transform: translate(4px, 2px) rotate(-1deg); } 80% { transform: translate(-2px, -2px) rotate(1deg); } 90% { transform: translate(2px, 3px) rotate(0deg); } 100% { transform: translate(2px, -3px) rotate(-1deg); } }
         .shake-screen { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        .shake-element { animation: shake 0.5s infinite; }
+        
+        @keyframes fastSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(1080deg); } }
+        .spinning { animation: fastSpin 2s cubic-bezier(0.2, 0.8, 0.2, 1); }
+
+        /* MUSIC EQUALIZER ANIMATION */
+        .equalizer { display: inline-flex; align-items: flex-end; gap: 3px; height: 14px; margin-right: 8px; }
+        .eq-bar { width: 3px; background-color: #1db954; border-radius: 2px; animation: bounceBar 1s infinite ease-in-out alternate; }
+        .eq-bar:nth-child(1) { height: 6px; animation-delay: 0.1s; }
+        .eq-bar:nth-child(2) { height: 14px; animation-delay: 0.3s; }
+        .eq-bar:nth-child(3) { height: 8px; animation-delay: 0.5s; }
+        @keyframes bounceBar { 0% { height: 4px; } 100% { height: 14px; } }
+
+        /* PLANT PROGRESS BAR */
+        .progress-bg { width: 80%; height: 12px; background: #e0e0e0; border-radius: 10px; margin: 15px auto; overflow: hidden; box-shadow: inset 0 2px 5px rgba(0,0,0,0.1); }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #d4fc79 0%, #96e6a1 100%); width: 0%; transition: width 0.5s ease; }
 
         #dynamic-island { position: fixed; top: max(12px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); width: 130px; height: 35px; background: black; border-radius: 30px; z-index: 100000; transition: 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: 600; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3); pointer-events: none; }
         .island-active { width: 90%; height: 65px; justify-content: flex-start; padding: 0 20px; box-sizing: border-box; }
@@ -62,7 +78,8 @@
         .cell:active { transform: scale(0.95); }
         .winning-cell { background: #ffeaa7 !important; transform: scale(1.05); box-shadow: 0 0 20px rgba(253, 203, 110, 0.8) !important; z-index: 10; }
 
-        .game-btn { display:block; margin: 15px auto; padding: 15px 30px; border-radius: 30px; border: none; background: #2f3542; color: white; font-weight: bold; font-size: 16px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .game-btn { display:block; margin: 15px auto; padding: 15px 30px; border-radius: 30px; border: none; background: #2f3542; color: white; font-weight: bold; font-size: 16px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: 0.2s; }
+        .game-btn:active { transform: scale(0.95); }
         
         #draw-board { border-radius: 20px; background: white; touch-action: none; margin: 10px auto; display: block; box-shadow: 0 5px 20px rgba(0,0,0,0.06); }
         .draw-tools { display: flex; justify-content: center; align-items: center; gap: 12px; margin-bottom: 15px; }
@@ -91,7 +108,12 @@
     <div style="text-align:center; padding: 5px 0 15px 0; font-weight:600; color:white; font-size: 14px; text-shadow:0 1px 5px rgba(0,0,0,0.3); opacity: 0.9;">
         <span>Mood: <span id="partner-mood-display">😊</span></span> <span style="margin: 0 5px;">|</span>
         <span>Batt: <span id="partner-battery-display">100% 🔋</span></span> <span style="margin: 0 5px;">|</span>
-        <span>🎵 <span id="music-display">Silence 🤫</span></span>
+        <span style="display:inline-flex; align-items:center;">
+            <div id="music-eq" class="equalizer" style="display:none;">
+                <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
+            </div>
+            <span id="music-display">Silence 🤫</span>
+        </span>
     </div>
 
     <div id="home-screen">
@@ -121,47 +143,58 @@
     <div id="musicApp" class="app-window">
         <div class="app-header"><div style="width:40px;"></div><span class="app-title">Music Sync</span><span class="done-btn" onclick="closeApp('musicApp')">Done</span></div>
         <div style="padding: 30px; text-align: center;">
-            <h3>What are you listening to? 🎧</h3>
-            <input id="song-input" class="chat-input" placeholder="e.g., Taylor Swift - Lover" style="width:90%; margin:20px 0;">
+            <div style="font-size: 70px; margin-bottom: 20px;">🎧</div>
+            <h3 style="color:#333;">What are you listening to?</h3>
+            <input id="song-input" class="chat-input" placeholder="e.g., Taylor Swift - Lover" style="width:90%; margin:20px 0; text-align: center;">
             <button class="game-btn" style="background:#1db954;" onclick="setMusic()">Sync Status</button>
+            <button class="game-btn" style="background:#ccc; color:#333;" onclick="clearMusic()">Clear Music</button>
         </div>
     </div>
 
     <div id="plantApp" class="app-window">
         <div class="app-header"><div style="width:40px;"></div><span class="app-title">Our Plant</span><span class="done-btn" onclick="closeApp('plantApp')">Done</span></div>
         <div style="padding: 40px 20px; text-align: center;">
-            <div id="plant-emoji" style="font-size: 100px; margin-bottom: 20px; transition: 0.3s;">🌱</div>
-            <h2 style="color:#2ed573;">Level: <span id="plant-level-text">0</span></h2>
-            <p style="color:#666;">Water the plant together to make it grow!</p>
-            <button class="game-btn" style="background:#1e90ff; font-size:20px; padding: 20px 40px;" onclick="waterPlant()">Water 💧</button>
+            <div id="plant-emoji" style="font-size: 110px; margin-bottom: 10px; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">🌱</div>
+            <h2 style="color:#2ed573; margin-bottom: 5px;">Level: <span id="plant-level-text">0</span></h2>
+            
+            <div class="progress-bg"><div id="plant-progress" class="progress-fill"></div></div>
+            <p style="color:#888; font-size: 13px; margin-top:0;">Next evolution at level <span id="next-evo">10</span>!</p>
+            
+            <button class="game-btn" style="background:#1e90ff; font-size:20px; padding: 20px 40px; margin-top: 30px; box-shadow: 0 10px 20px rgba(30, 144, 255, 0.3);" onclick="waterPlant()">Water 💧</button>
         </div>
     </div>
 
     <div id="dateApp" class="app-window">
         <div class="app-header"><div style="width:40px;"></div><span class="app-title">Date Roulette</span><span class="done-btn" onclick="closeApp('dateApp')">Done</span></div>
         <div style="padding: 40px 20px; text-align: center;">
-            <h1 style="font-size: 50px; margin:0;">🎲</h1>
+            <div id="roulette-emoji" style="font-size: 80px; margin-bottom: 20px; display:inline-block;">🎲</div>
             <h3 style="color:#333; margin: 20px 0;">Can't decide on date night?</h3>
-            <button class="game-btn" style="background:#ff4757; font-size:18px;" onclick="spinDate()">Spin the Wheel!</button>
+            <p style="color:#666; font-size: 14px; margin-bottom: 30px;">We'll randomly pick dinner & activity!</p>
+            <button class="game-btn" style="background:#ff4757; font-size:18px; padding: 18px 40px;" onclick="spinDate()">Spin the Wheel!</button>
         </div>
     </div>
 
     <div id="countApp" class="app-window">
         <div class="app-header"><div style="width:40px;"></div><span class="app-title">Countdown</span><span class="done-btn" onclick="closeApp('countApp')">Done</span></div>
-        <div style="padding: 40px 20px; text-align: center;">
-            <h1 id="countdown-display" style="font-size: 60px; color: var(--primary); margin:0;">0</h1>
-            <h3 style="color:#666; margin-top:0;">Days Left</h3>
-            <input type="date" id="date-input" class="chat-input" style="width:80%; margin:30px 0;">
-            <button class="game-btn" onclick="setCountdown()">Set Target Date</button>
+        <div style="padding: 30px 20px; text-align: center;">
+            
+            <div style="background: white; border-radius: 30px; padding: 40px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 30px;">
+                <h1 id="countdown-display" style="font-size: 70px; color: var(--ios-blue); margin:0; font-weight: 800; letter-spacing: -2px;">0</h1>
+                <h3 style="color:#888; margin-top:5px; text-transform: uppercase; font-size: 14px; letter-spacing: 2px;">Days Left</h3>
+            </div>
+            
+            <p style="font-weight: bold; color: #555;">Set Target Date:</p>
+            <input type="date" id="date-input" class="chat-input" style="width:80%; margin:10px 0 20px 0; text-align: center;">
+            <button class="game-btn" onclick="setCountdown()">Start Countdown</button>
         </div>
     </div>
 
     <div id="magicApp" class="app-window">
         <div class="app-header"><div style="width:40px;"></div><span class="app-title">Magic 8-Ball</span><span class="done-btn" onclick="closeApp('magicApp')">Done</span></div>
         <div style="padding: 40px 20px; text-align: center;">
-            <div style="font-size: 80px; margin-bottom: 20px;">🎱</div>
-            <input id="eightball-input" class="chat-input" placeholder="Ask a yes/no question..." style="width:90%; margin-bottom: 20px;">
-            <button class="game-btn" onclick="shake8Ball()">Shake & Send!</button>
+            <div id="eightball-emoji" style="font-size: 90px; margin-bottom: 30px; display: inline-block;">🎱</div>
+            <input id="eightball-input" class="chat-input" placeholder="Ask a yes/no question..." style="width:90%; margin-bottom: 30px; text-align: center;">
+            <button class="game-btn" style="background: #2c3e50; padding: 18px 50px; font-size: 18px;" onclick="shake8Ball()">Shake & Reveal</button>
         </div>
     </div>
 
@@ -170,10 +203,7 @@
     <div id="messageApp" class="app-window">
         <div class="app-header"><div style="width:40px;"></div><span class="app-title">Messages</span><span class="done-btn" onclick="closeApp('messageApp')">Done</span></div>
         <div id="main-chat" class="chat-container"></div>
-        <div class="input-area">
-            <input id="main-input" class="chat-input" placeholder="iMessage" autocomplete="off" oninput="handleTyping()" />
-            <button onclick="sendMessage('main-input')" style="background:var(--ios-blue); color:white; border:none; border-radius:50%; width:40px; height:40px; font-weight:bold;">↑</button>
-        </div>
+        <div class="input-area"><input id="main-input" class="chat-input" placeholder="iMessage" autocomplete="off" oninput="handleTyping()" /><button onclick="sendMessage('main-input')" style="background:var(--ios-blue); color:white; border:none; border-radius:50%; width:40px; height:40px; font-weight:bold;">↑</button></div>
     </div>
     
     <div id="gamesApp" class="app-window">
@@ -210,7 +240,6 @@
             setTimeout(() => { island.classList.remove('island-active'); }, 4000);
         });
 
-        // Battery & Buzz & Locket & Mood
         if ('getBattery' in navigator) { navigator.getBattery().then(function(battery) { function updateBattery() { let level = Math.round(battery.level * 100) + "%"; let icon = battery.charging ? "⚡" : "🔋"; socket.emit('update battery', level + " " + icon); } updateBattery(); battery.addEventListener('levelchange', updateBattery); battery.addEventListener('chargingchange', updateBattery); }); }
         socket.on('battery update', (batt) => { document.getElementById('partner-battery-display').innerText = batt; });
         function triggerBuzz() { socket.emit('send buzz'); }
@@ -221,22 +250,48 @@
         socket.on('mood update', mood => { document.getElementById('partner-mood-display').innerText = mood; });
 
         // --- 🎵 MUSIC APP ---
-        function setMusic() { const song = document.getElementById('song-input').value; if(song) { socket.emit('set music', song); document.getElementById('song-input').value = ""; closeApp('musicApp'); } }
-        socket.on('music update', song => { document.getElementById('music-display').innerText = song; });
+        function setMusic() { 
+            const song = document.getElementById('song-input').value; 
+            if(song) { socket.emit('set music', song); document.getElementById('song-input').value = ""; closeApp('musicApp'); } 
+        }
+        function clearMusic() { socket.emit('set music', 'Silence 🤫'); closeApp('musicApp'); }
+        socket.on('music update', song => { 
+            document.getElementById('music-display').innerText = song; 
+            // Turn on/off equalizer animation based on if a song is playing
+            if(song === 'Silence 🤫') document.getElementById('music-eq').style.display = 'none';
+            else document.getElementById('music-eq').style.display = 'inline-flex';
+        });
 
         // --- 🪴 PLANT APP ---
         function waterPlant() { socket.emit('water plant'); }
         socket.on('plant update', level => {
             document.getElementById('plant-level-text').innerText = level;
-            let emoji = "🌱";
-            if(level > 10) emoji = "🌿";
-            if(level > 30) emoji = "🪴";
-            if(level > 60) emoji = "🌸";
-            if(level > 100) emoji = "🌳";
+            
+            // Emoji evolution logic
+            let emoji = "🌱"; let nextEvo = 10;
+            if(level >= 10) { emoji = "🌿"; nextEvo = 30; }
+            if(level >= 30) { emoji = "🪴"; nextEvo = 60; }
+            if(level >= 60) { emoji = "🌸"; nextEvo = 100; }
+            if(level >= 100) { emoji = "🌳"; nextEvo = "MAX"; }
+            
             document.getElementById('plant-emoji').innerText = emoji;
-            // Little bounce animation
+            document.getElementById('next-evo').innerText = nextEvo;
+            
+            // Progress Bar Math
+            let progress = 100;
+            if(nextEvo !== "MAX") {
+                let prevEvo = 0;
+                if(level >= 10) prevEvo = 10;
+                if(level >= 30) prevEvo = 30;
+                if(level >= 60) prevEvo = 60;
+                progress = ((level - prevEvo) / (nextEvo - prevEvo)) * 100;
+            }
+            document.getElementById('plant-progress').style.width = progress + '%';
+
+            // Watering Bounce Animation
             let p = document.getElementById('plant-emoji');
-            p.style.transform = "scale(1.2)"; setTimeout(() => p.style.transform = "scale(1)", 200);
+            p.style.transform = "scale(1.2) translateY(-10px)"; 
+            setTimeout(() => p.style.transform = "scale(1) translateY(0)", 200);
         });
 
         // --- ⏳ COUNTDOWN APP ---
@@ -253,24 +308,38 @@
         const dinners = ["Sushi 🍣", "Italian 🍝", "Burgers 🍔", "Tacos 🌮", "Cook Together 🍳"];
         const activities = ["Netflix Movie 🍿", "Board Games 🎲", "Late Night Walk 🌙", "Deep Talk 🗣️", "Video Games 🎮"];
         function spinDate() {
-            let d = dinners[Math.floor(Math.random() * dinners.length)];
-            let a = activities[Math.floor(Math.random() * activities.length)];
-            let msg = `🎲 **Date Night Pick!**\n🍽️ Dinner: ${d}\n🎬 Activity: ${a}`;
-            addMessageToBoth(msg, 'me'); socket.emit('chat message', {text: msg}); closeApp('dateApp');
+            let r = document.getElementById('roulette-emoji');
+            r.classList.add('spinning'); // Add CSS spin class
+            
+            // Wait for 2 second animation to finish before announcing
+            setTimeout(() => {
+                r.classList.remove('spinning');
+                let d = dinners[Math.floor(Math.random() * dinners.length)];
+                let a = activities[Math.floor(Math.random() * activities.length)];
+                let msg = `🎲 **Date Night Pick!**\n🍽️ Dinner: ${d}\n🎬 Activity: ${a}`;
+                addMessageToBoth(msg, 'me'); socket.emit('chat message', {text: msg}); closeApp('dateApp');
+            }, 2000);
         }
 
         // --- 🎱 MAGIC 8-BALL ---
         const answers = ["Yes, definitely! ✨", "No way. 🙅", "Ask again later ⏳", "It is certain 💯", "Very doubtful 😬", "Absolutely! ❤️"];
         function shake8Ball() {
             let q = document.getElementById('eightball-input').value; if(!q) return;
-            let a = answers[Math.floor(Math.random() * answers.length)];
-            let msg = `🎱 **Question:** ${q}\n✨ **Answer:** ${a}`;
-            addMessageToBoth(msg, 'me'); socket.emit('chat message', {text: msg});
-            document.getElementById('eightball-input').value = ""; closeApp('magicApp');
+            let ball = document.getElementById('eightball-emoji');
+            ball.classList.add('shake-element'); // Add CSS shake class
+            
+            // Wait for 1 second shake animation
+            setTimeout(() => {
+                ball.classList.remove('shake-element');
+                let a = answers[Math.floor(Math.random() * answers.length)];
+                let msg = `🎱 **Question:** ${q}\n✨ **Answer:** ${a}`;
+                addMessageToBoth(msg, 'me'); socket.emit('chat message', {text: msg});
+                document.getElementById('eightball-input').value = ""; closeApp('magicApp');
+            }, 1000);
         }
 
-        // --- CHAT & GAMES (Retained) ---
-        function addMessageToBoth(text, type) { const now = new Date(); let hours = now.getHours(); let ampm = hours >= 12 ? 'PM' : 'AM'; hours = hours % 12 || 12; let mins = now.getMinutes() < 10 ? '0' + now.getMinutes() : now.getMinutes(); let timeStr = hours + ':' + mins + ' ' + ampm; const createBubble = () => { var div = document.createElement('div'); div.className = 'bubble ' + type; div.innerHTML = text + `<span class="msg-time">${timeStr}</span>`; return div; }; let mainChat = document.getElementById('main-chat'); mainChat.appendChild(createBubble()); mainChat.scrollTop = mainChat.scrollHeight; let miniChat = document.getElementById('mini-chat'); miniChat.appendChild(createBubble()); miniChat.scrollTop = miniChat.scrollHeight; let typingBubbles = document.querySelectorAll('.typing-bubble-container'); typingBubbles.forEach(b => b.remove()); }
+        // Chat & Games
+        function addMessageToBoth(text, type) { const now = new Date(); let hours = now.getHours(); let ampm = hours >= 12 ? 'PM' : 'AM'; hours = hours % 12 || 12; let mins = now.getMinutes() < 10 ? '0' + now.getMinutes() : now.getMinutes(); let timeStr = hours + ':' + mins + ' ' + ampm; const createBubble = () => { var div = document.createElement('div'); div.className = 'bubble ' + type; div.innerHTML = text.replace(/\n/g, '<br>') + `<span class="msg-time">${timeStr}</span>`; return div; }; let mainChat = document.getElementById('main-chat'); mainChat.appendChild(createBubble()); mainChat.scrollTop = mainChat.scrollHeight; let miniChat = document.getElementById('mini-chat'); miniChat.appendChild(createBubble()); miniChat.scrollTop = miniChat.scrollHeight; let typingBubbles = document.querySelectorAll('.typing-bubble-container'); typingBubbles.forEach(b => b.remove()); }
         function sendMessage(inputId) { var inputField = document.getElementById(inputId); if(inputField.value) { addMessageToBoth(inputField.value, 'me'); socket.emit('chat message', {text: inputField.value}); inputField.value = ''; socket.emit('stop typing'); } }
         socket.on('chat message', d => addMessageToBoth(d.text, 'them'));
         let typingTimer; function handleTyping() { socket.emit('typing'); clearTimeout(typingTimer); typingTimer = setTimeout(() => socket.emit('stop typing'), 1500); }
