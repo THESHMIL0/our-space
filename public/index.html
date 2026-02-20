@@ -55,11 +55,17 @@
         #snap-image { flex: 1; width: 100%; object-fit: contain; }
         #snap-timer-bar { height: 6px; background: var(--primary); width: 100%; border-radius: 0 0 10px 10px; }
 
-        #ttt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 280px; margin: 30px auto; }
-        .cell { width: 85px; height: 85px; background: white; border-radius: 22px; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.05);}
+        /* TIC-TAC-TOE UPGRADES */
+        #ttt-status { font-size: 22px; font-weight: 800; color: #333; margin: 15px 0 5px 0; transition: 0.3s; }
+        #ttt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 280px; margin: 15px auto 30px auto; }
+        .cell { width: 85px; height: 85px; background: white; border-radius: 22px; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: 0.2s;}
+        .cell:active { transform: scale(0.95); }
+        
+        /* The magical glowing effect when someone wins! */
+        .winning-cell { background: #ffeaa7 !important; transform: scale(1.05); box-shadow: 0 0 20px rgba(253, 203, 110, 0.8) !important; z-index: 10; }
+
         .game-btn { display:block; margin: 15px auto; padding: 15px 30px; border-radius: 30px; border: none; background: #2f3542; color: white; font-weight: bold; font-size: 16px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         
-        /* NEW DRAWING TOOLS CSS */
         #draw-board { border-radius: 20px; background: white; touch-action: none; margin: 10px auto; display: block; box-shadow: 0 5px 20px rgba(0,0,0,0.06); }
         .draw-tools { display: flex; justify-content: center; align-items: center; gap: 12px; margin-bottom: 15px; }
         .color-btn { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 3px solid transparent; transition: 0.2s; }
@@ -71,7 +77,6 @@
     </style>
 </head>
 <body>
-
     <div id="dynamic-island"><span id="island-text">Notification</span></div>
 
     <div id="status-bar">
@@ -132,7 +137,16 @@
     <div id="gamesApp" class="app-window">
         <div class="app-header"><div style="width:40px;"></div><span id="game-title" class="app-title">App</span><span class="done-btn" onclick="closeApp('gamesApp')">Done</span></div>
         <div id="game-screens" style="text-align: center; border-bottom: 1px solid #ddd; padding-bottom: 20px; background: white;">
-            <div id="screen-ttt"><div id="ttt-grid"><div class="cell" onclick="makeMove(0)"></div><div class="cell" onclick="makeMove(1)"></div><div class="cell" onclick="makeMove(2)"></div><div class="cell" onclick="makeMove(3)"></div><div class="cell" onclick="makeMove(4)"></div><div class="cell" onclick="makeMove(5)"></div><div class="cell" onclick="makeMove(6)"></div><div class="cell" onclick="makeMove(7)"></div><div class="cell" onclick="makeMove(8)"></div></div><button class="game-btn" onclick="resetGame()">Restart Board</button></div>
+            
+            <div id="screen-ttt">
+                <h3 id="ttt-status">X's Turn</h3>
+                <div id="ttt-grid">
+                    <div class="cell" onclick="makeMove(0)"></div><div class="cell" onclick="makeMove(1)"></div><div class="cell" onclick="makeMove(2)"></div>
+                    <div class="cell" onclick="makeMove(3)"></div><div class="cell" onclick="makeMove(4)"></div><div class="cell" onclick="makeMove(5)"></div>
+                    <div class="cell" onclick="makeMove(6)"></div><div class="cell" onclick="makeMove(7)"></div><div class="cell" onclick="makeMove(8)"></div>
+                </div>
+                <button class="game-btn" onclick="resetGame()">Restart Game</button>
+            </div>
             
             <div id="screen-draw" style="display:none; padding-top: 15px;">
                 <div class="draw-tools">
@@ -142,12 +156,9 @@
                     <div class="color-btn" style="background:#2f3542;" onclick="setBrush('#2f3542')"></div>
                     <button class="eraser-btn" onclick="setBrush('#ffffff')">Eraser</button>
                 </div>
-                <div class="draw-tools" style="margin-bottom: 15px;">
-                    <span style="font-size: 14px; font-weight: bold; color: #555;">Thickness:</span>
-                    <input type="range" id="brush-size" style="width: 120px;" min="2" max="20" value="4" onchange="updateSize(this.value)">
-                </div>
+                <div class="draw-tools" style="margin-bottom: 15px;"><span style="font-size: 14px; font-weight: bold; color: #555;">Thickness:</span><input type="range" id="brush-size" style="width: 120px;" min="2" max="20" value="4" onchange="updateSize(this.value)"></div>
                 <canvas id="draw-board" width="280" height="280"></canvas>
-                <button class="game-btn" style="background: #ff9f43;" onclick="clearCanvas()">Erase Entire Canvas</button>
+                <button class="game-btn" style="background: #ff9f43;" onclick="clearCanvas()">Erase Canvas</button>
             </div>
 
             <div id="screen-tod" style="display:none; padding: 30px;"><h3>Truth or Dare</h3><button class="game-btn" style="background: #ff4757;" onclick="playToD()">Spin the Wheel 🎲</button></div>
@@ -200,69 +211,85 @@
         function sendMessage(inputId) { var inputField = document.getElementById(inputId); if(inputField.value) { addMessageToBoth(inputField.value, 'me'); socket.emit('chat message', {text: inputField.value}); inputField.value = ''; } }
         socket.on('chat message', d => addMessageToBoth(d.text, 'them'));
 
-        let currentTurn = 'X'; function makeMove(idx) { socket.emit('make move', { index: idx, symbol: currentTurn }); }
-        socket.on('game update', state => { const cells = document.querySelectorAll('.cell'); let xCount = 0; let oCount = 0; state.forEach((val, i) => { cells[i].innerText = val || ''; if (val === 'X') xCount++; if (val === 'O') oCount++; cells[i].style.color = val === 'X' ? '#ff4757' : '#2ed573'; }); currentTurn = (xCount > oCount) ? 'O' : 'X'; });
+        function triggerHeart() { socket.emit('send heart'); }
+        socket.on('show heart', () => { const heart = document.createElement('div'); heart.innerText = '❤️'; heart.className = 'floating-heart'; heart.style.left = Math.random() * 80 + 10 + 'vw'; document.body.appendChild(heart); setTimeout(() => heart.remove(), 3000); });
+
+        // --- 🏆 THE NEW TIC-TAC-TOE ENGINE ---
+        let currentTurn = 'X'; 
+        let localGameState = Array(9).fill(null);
+        let gameActive = true;
+
+        function makeMove(idx) { 
+            // Anti-Cheat: Stop if cell is full or game is already over
+            if (localGameState[idx] || !gameActive) return; 
+            socket.emit('make move', { index: idx, symbol: currentTurn }); 
+        }
+
+        socket.on('game update', state => { 
+            localGameState = state;
+            const cells = document.querySelectorAll('#ttt-grid .cell'); 
+            let xCount = 0; let oCount = 0; 
+            
+            cells.forEach(c => c.classList.remove('winning-cell')); // Reset glow
+            
+            state.forEach((val, i) => { 
+                cells[i].innerText = val || ''; 
+                if (val === 'X') xCount++; 
+                if (val === 'O') oCount++; 
+                cells[i].style.color = val === 'X' ? '#ff4757' : '#2ed573'; 
+            }); 
+            
+            currentTurn = (xCount > oCount) ? 'O' : 'X'; 
+            document.getElementById('ttt-status').innerText = `${currentTurn}'s Turn`;
+            
+            checkWinAndDraw(state);
+        });
+
+        function checkWinAndDraw(state) {
+            const winConditions = [ [0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6] ];
+            let roundWon = false;
+            for (let i = 0; i < winConditions.length; i++) {
+                const winCondition = winConditions[i];
+                let a = state[winCondition[0]], b = state[winCondition[1]], c = state[winCondition[2]];
+                if (a === null || b === null || c === null) continue;
+                if (a === b && b === c) {
+                    roundWon = true;
+                    // Make the winning tiles glow!
+                    document.querySelectorAll('#ttt-grid .cell')[winCondition[0]].classList.add('winning-cell');
+                    document.querySelectorAll('#ttt-grid .cell')[winCondition[1]].classList.add('winning-cell');
+                    document.querySelectorAll('#ttt-grid .cell')[winCondition[2]].classList.add('winning-cell');
+                    document.getElementById('ttt-status').innerText = `🎉 ${a} Wins! 🎉`;
+                    document.getElementById('ttt-status').style.color = a === 'X' ? '#ff4757' : '#2ed573';
+                    gameActive = false;
+                    break;
+                }
+            }
+            if (!roundWon && !state.includes(null)) {
+                document.getElementById('ttt-status').innerText = `It's a Draw! 🤝`;
+                document.getElementById('ttt-status').style.color = '#333';
+                gameActive = false;
+            } else if (!roundWon) {
+                gameActive = true;
+                document.getElementById('ttt-status').style.color = '#333';
+            }
+        }
+
         function resetGame() { socket.emit('reset game'); }
+
         const prompts = ["Truth: First impression of me?", "Dare: Send a silly selfie!", "Truth: Favorite memory?", "Dare: Emoji only for 5 mins!", "Truth: A secret you haven't told me?", "Dare: I pick dinner tonight!"];
         function playToD() { let msg = "🎲 " + prompts[Math.floor(Math.random() * prompts.length)]; addMessageToBoth(msg, 'me'); socket.emit('chat message', {text: msg}); }
         function flipCoin() { let msg = "🪙 Flipped a coin: **" + (Math.random() < 0.5 ? "Heads" : "Tails") + "**!"; addMessageToBoth(msg, 'me'); socket.emit('chat message', {text: msg}); }
 
-        function triggerHeart() { socket.emit('send heart'); }
-        socket.on('show heart', () => { const heart = document.createElement('div'); heart.innerText = '❤️'; heart.className = 'floating-heart'; heart.style.left = Math.random() * 80 + 10 + 'vw'; document.body.appendChild(heart); setTimeout(() => heart.remove(), 3000); });
-
-        // --- NEW DRAWING LOGIC WITH COLORS & SIZES ---
         const canvas = document.getElementById('draw-board'); const ctx = canvas.getContext('2d');
-        ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-        let drawing = false;
-        
-        // Default brush settings
-        let brushColor = '#ff4757'; 
-        let brushSize = 4;
-
-        // Functions to update brush
-        function setBrush(color) { brushColor = color; }
-        function updateSize(size) { brushSize = size; }
-
+        ctx.lineCap = 'round'; ctx.lineJoin = 'round'; let drawing = false; let brushColor = '#ff4757'; let brushSize = 4;
+        function setBrush(color) { brushColor = color; } function updateSize(size) { brushSize = size; }
         function getPos(e) { const rect = canvas.getBoundingClientRect(); return { x: (e.touches ? e.touches[0].clientX : e.clientX) - rect.left, y: (e.touches ? e.touches[0].clientY : e.clientY) - rect.top }; }
-        
-        function startDraw(e) { 
-            drawing = true; const pos = getPos(e); 
-            // We now send the color and size to the partner!
-            socket.emit('draw', { type: 'start', x: pos.x, y: pos.y, color: brushColor, size: brushSize }); 
-            ctx.beginPath(); 
-            ctx.strokeStyle = brushColor;
-            ctx.lineWidth = brushSize;
-            ctx.moveTo(pos.x, pos.y); 
-            e.preventDefault(); 
-        }
-        function drawLine(e) { 
-            if (!drawing) return; const pos = getPos(e); 
-            socket.emit('draw', { type: 'draw', x: pos.x, y: pos.y, color: brushColor, size: brushSize }); 
-            ctx.strokeStyle = brushColor;
-            ctx.lineWidth = brushSize;
-            ctx.lineTo(pos.x, pos.y); ctx.stroke(); e.preventDefault(); 
-        }
+        function startDraw(e) { drawing = true; const pos = getPos(e); socket.emit('draw', { type: 'start', x: pos.x, y: pos.y, color: brushColor, size: brushSize }); ctx.beginPath(); ctx.strokeStyle = brushColor; ctx.lineWidth = brushSize; ctx.moveTo(pos.x, pos.y); e.preventDefault(); }
+        function drawLine(e) { if (!drawing) return; const pos = getPos(e); socket.emit('draw', { type: 'draw', x: pos.x, y: pos.y, color: brushColor, size: brushSize }); ctx.strokeStyle = brushColor; ctx.lineWidth = brushSize; ctx.lineTo(pos.x, pos.y); ctx.stroke(); e.preventDefault(); }
         function stopDraw() { drawing = false; ctx.beginPath(); }
-        
         canvas.addEventListener('mousedown', startDraw); canvas.addEventListener('mousemove', drawLine); canvas.addEventListener('mouseup', stopDraw);
         canvas.addEventListener('touchstart', startDraw, {passive: false}); canvas.addEventListener('touchmove', drawLine, {passive: false}); canvas.addEventListener('touchend', stopDraw);
-        
-        // Partner receives the drawing data, INCLUDING color and size!
-        socket.on('draw', data => { 
-            if (data.type === 'start') { 
-                ctx.beginPath(); 
-                ctx.strokeStyle = data.color || '#ff4757'; // Fallback to red if missing
-                ctx.lineWidth = data.size || 4;
-                ctx.moveTo(data.x, data.y); 
-            } else if (data.type === 'draw') { 
-                ctx.strokeStyle = data.color || '#ff4757';
-                ctx.lineWidth = data.size || 4;
-                ctx.lineTo(data.x, data.y); ctx.stroke(); 
-            } else if (data.type === 'clear') { 
-                ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.beginPath(); 
-            } 
-        });
-        
+        socket.on('draw', data => { if (data.type === 'start') { ctx.beginPath(); ctx.strokeStyle = data.color || '#ff4757'; ctx.lineWidth = data.size || 4; ctx.moveTo(data.x, data.y); } else if (data.type === 'draw') { ctx.strokeStyle = data.color || '#ff4757'; ctx.lineWidth = data.size || 4; ctx.lineTo(data.x, data.y); ctx.stroke(); } else if (data.type === 'clear') { ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.beginPath(); } });
         function clearCanvas() { socket.emit('draw', { type: 'clear' }); ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.beginPath(); }
     </script>
 </body>
