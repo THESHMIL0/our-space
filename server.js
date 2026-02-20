@@ -16,12 +16,12 @@ let gameState = Array(9).fill(null);
 io.on('connection', (socket) => {
     socket.emit('game update', gameState);
 
-    // Chat router
+    // Chat
     socket.on('chat message', (data) => {
         socket.broadcast.emit('chat message', { text: data.text, sender: 'them' });
     });
 
-    // Tic-Tac-Toe logic
+    // Tic-Tac-Toe
     socket.on('make move', (data) => {
         gameState[data.index] = data.symbol;
         io.emit('game update', gameState);
@@ -30,6 +30,16 @@ io.on('connection', (socket) => {
     socket.on('reset game', () => {
         gameState = Array(9).fill(null);
         io.emit('game update', gameState);
+    });
+
+    // --- NEW: Live Drawing ---
+    socket.on('draw', (data) => {
+        socket.broadcast.emit('draw', data); // Bounces the drawing coordinates to partner
+    });
+
+    // --- NEW: Floating Hearts ---
+    socket.on('send heart', () => {
+        io.emit('show heart'); // Tells BOTH screens to spawn a heart
     });
 });
 
