@@ -1,21 +1,11 @@
 {
   "short_name": "Our Space",
-  "name": "Our Space: Couple App",
-  "icons": [
-    {
-      "src": "https://res.cloudinary.com/dfve8uora/image/upload/v1/favicon.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "https://res.cloudinary.com/dfve8uora/image/upload/v1/favicon.png",
-      "type": "image/png",
-      "sizes": "512x512"
-    }
-  ],
+  "name": "Our Space",
   "start_url": "/",
-  "background_color": "#ffffff",
   "display": "standalone",
   "theme_color": "#ff4757",
-  "description": "Our private forever space."
+  "background_color": "#ffffff",
+  "icons": [
+    { "src": "https://res.cloudinary.com/dfve8uora/image/upload/v1/favicon.png", "sizes": "512x512", "type": "image/png" }
+  ]
 }
