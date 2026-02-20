@@ -1,70 +1,113 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Our Space</title>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <title>Our Space</title>
     <style>
-        body { font-family: -apple-system, system-ui; margin: 0; background: #f0f0f5; overflow: hidden; }
-        #home-screen { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 40px 20px; text-align: center; }
-        .app-icon { width: 70px; height: 70px; border-radius: 15px; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 35px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .app-label { font-size: 13px; font-weight: 500; }
-        .app-window { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: none; flex-direction: column; z-index: 100; }
-        .app-header { padding: 15px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
-        .close-btn { color: #007aff; cursor: pointer; }
-        #messages { flex: 1; overflow-y: auto; padding: 20px; background: #fff; display: flex; flex-direction: column; }
-        .bubble { max-width: 70%; padding: 10px 15px; border-radius: 20px; margin-bottom: 10px; font-size: 16px; line-height: 1.4; }
-        .me { align-self: flex-end; background: #007aff; color: white; border-bottom-right-radius: 5px; }
-        .them { align-self: flex-start; background: #e9e9eb; color: black; border-bottom-left-radius: 5px; }
-        .input-area { padding: 10px; border-top: 1px solid #ddd; display: flex; gap: 10px; }
-        #m { flex: 1; padding: 10px; border-radius: 20px; border: 1px solid #ddd; outline: none; }
-        #gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; overflow-y: auto; }
+        :root { --primary: #ff4757; --bg: #f8f9fa; --glass: rgba(255, 255, 255, 0.9); }
+        body { font-family: -apple-system, sans-serif; margin: 0; background: var(--bg); color: #2f3542; transition: 0.3s; }
+        
+        /* Dashboard Header */
+        #dashboard-header { padding: 40px 20px 20px; text-align: center; background: white; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        #counter-days { font-size: 48px; font-weight: 800; color: var(--primary); margin: 0; }
+        #counter-label { font-size: 14px; text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; }
+
+        /* Home Icons */
+        #home-screen { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 30px 20px; }
+        .app-card { background: white; padding: 20px 10px; border-radius: 24px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: 0.2s; cursor: pointer; }
+        .app-card:active { transform: scale(0.9); }
+        .app-icon { font-size: 32px; margin-bottom: 8px; display: block; }
+        .app-label { font-size: 12px; font-weight: 600; }
+
+        /* App Windows */
+        .app-window { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: none; flex-direction: column; z-index: 100; animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        
+        .app-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; }
+        .close-btn { background: #eee; padding: 8px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; }
+
+        /* Chat UI */
+        #messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .bubble { max-width: 75%; padding: 12px 16px; border-radius: 20px; font-size: 15px; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .me { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 4px; }
+        .them { align-self: flex-start; background: #e9e9eb; color: black; border-bottom-left-radius: 4px; }
+
+        /* Tic Tac Toe Grid */
+        #ttt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 300px; margin: 50px auto; }
+        .cell { width: 90px; height: 90px; background: #f1f2f6; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: bold; cursor: pointer; }
+        
+        /* Gallery */
+        #gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
         #gallery-grid img { width: 100%; aspect-ratio: 1; object-fit: cover; }
     </style>
 </head>
 <body>
 
+    <div id="dashboard-header">
+        <p id="counter-days">0</p>
+        <p id="counter-label">Days of Us ❤️</p>
+    </div>
+
     <div id="home-screen">
-        <div onclick="openApp('messageApp')">
-            <div class="app-icon" style="background: #4cd964; color: white;">💬</div>
-            <div class="app-label">Messages</div>
+        <div class="app-card" onclick="openApp('messageApp')">
+            <span class="app-icon">💬</span>
+            <span class="app-label">Chat</span>
         </div>
-        <div onclick="openApp('galleryApp')">
-            <div class="app-icon" style="background: linear-gradient(135deg, #ffcc00, #ff9500);">🌻</div>
-            <div class="app-label">Gallery</div>
+        <div class="app-card" onclick="openApp('galleryApp')">
+            <span class="app-icon">🌻</span>
+            <span class="app-label">Gallery</span>
         </div>
-        <div onclick="openApp('gamesApp')">
-            <div class="app-icon" style="background: #5ac8fa; color: white;">🎮</div>
-            <div class="app-label">Games</div>
+        <div class="app-card" onclick="openApp('gamesApp')">
+            <span class="app-icon">🎮</span>
+            <span class="app-label">Game</span>
         </div>
     </div>
 
     <div id="messageApp" class="app-window">
-        <div class="app-header"><span>My Love ❤️</span><span class="close-btn" onclick="closeApp('messageApp')">Close</span></div>
+        <div class="app-header"><span>Messages</span><span class="close-btn" onclick="closeApp('messageApp')">Done</span></div>
         <div id="messages"></div>
-        <div class="input-area">
-            <input id="m" placeholder="iMessage" autocomplete="off" />
-            <button onclick="sendMessage()" style="border:none; background:#007aff; color:white; border-radius:50%; width:35px; height:35px;">↑</button>
+        <div style="padding: 15px; display: flex; gap: 10px;">
+            <input id="m" style="flex:1; padding: 12px; border-radius: 25px; border: 1px solid #ddd; outline: none;" placeholder="Message..." />
+            <button onclick="sendMessage()" style="background:var(--primary); color:white; border:none; border-radius:50%; width:40px; height:40px;">↑</button>
         </div>
     </div>
 
-    <div id="galleryApp" class="app-window">
-        <div class="app-header"><span>Our Gallery</span><span class="close-btn" onclick="closeApp('galleryApp')">Close</span></div>
-        <div style="padding: 10px;"><input type="file" id="photoInput" onchange="uploadPhoto()" accept="image/*"></div>
-        <div id="gallery-grid"></div>
+    <div id="gamesApp" class="app-window">
+        <div class="app-header"><span>Tic-Tac-Toe</span><span class="close-btn" onclick="closeApp('gamesApp')">Quit</span></div>
+        <div id="ttt-grid">
+            <div class="cell" onclick="makeMove(0)"></div><div class="cell" onclick="makeMove(1)"></div><div class="cell" onclick="makeMove(2)"></div>
+            <div class="cell" onclick="makeMove(3)"></div><div class="cell" onclick="makeMove(4)"></div><div class="cell" onclick="makeMove(5)"></div>
+            <div class="cell" onclick="makeMove(6)"></div><div class="cell" onclick="makeMove(7)"></div><div class="cell" onclick="makeMove(8)"></div>
+        </div>
+        <button onclick="resetGame()" style="display:block; margin: 20px auto; padding: 10px 20px; border-radius: 20px; border: none; background: #2f3542; color: white;">Restart Game</button>
     </div>
 
-    <div id="gamesApp" class="app-window">
-        <div class="app-header"><span>Games</span><span class="close-btn" onclick="closeApp('gamesApp')">Close</span></div>
-        <div style="padding: 20px; text-align: center;"><h3>Tic-Tac-Toe Coming Soon!</h3></div>
+    <div id="galleryApp" class="app-window">
+        <div class="app-header"><span>Memories</span><span class="close-btn" onclick="closeApp('galleryApp')">Close</span></div>
+        <input type="file" id="pInput" onchange="upload()" style="padding: 20px;">
+        <div id="gallery-grid"></div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         var socket = io();
+        
+        // --- RELATIONSHIP COUNTER ---
+        // Change this date to when you guys met/started!
+        const startDate = new Date("2024-01-01"); 
+        function updateCounter() {
+            const now = new Date();
+            const diff = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
+            document.getElementById('counter-days').innerText = diff;
+        }
+        updateCounter();
 
+        // --- APP LOGIC ---
         function openApp(id) { document.getElementById(id).style.display = 'flex'; }
         function closeApp(id) { document.getElementById(id).style.display = 'none'; }
 
+        // --- CHAT ---
         function addMessage(text, type) {
             var div = document.createElement('div');
             div.className = 'bubble ' + type;
@@ -72,37 +115,41 @@
             document.getElementById('messages').appendChild(div);
             document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
         }
-
         function sendMessage() {
-            var input = document.getElementById('m');
-            if (input.value) {
-                addMessage(input.value, 'me');
-                socket.emit('chat message', { text: input.value, sender: 'me' });
-                input.value = '';
+            var i = document.getElementById('m');
+            if(i.value) {
+                addMessage(i.value, 'me');
+                socket.emit('chat message', {text: i.value});
+                i.value = '';
             }
         }
+        socket.on('chat message', d => addMessage(d.text, 'them'));
+        socket.on('load history', h => h.forEach(m => addMessage(m.text, m.sender === 'me' ? 'me' : 'them')));
 
-        socket.on('chat message', function(data) { addMessage(data.text, 'them'); });
-
-        socket.on('load history', function(messages) {
-            document.getElementById('messages').innerHTML = '';
-            messages.forEach(m => addMessage(m.text, m.sender === 'me' ? 'me' : 'them'));
+        // --- GAME LOGIC ---
+        let mySymbol = 'X'; // You can make this dynamic later
+        function makeMove(idx) {
+            socket.emit('make move', { index: idx, symbol: mySymbol });
+        }
+        socket.on('game update', state => {
+            const cells = document.querySelectorAll('.cell');
+            state.forEach((val, i) => {
+                cells[i].innerText = val || '';
+                cells[i].style.color = val === 'X' ? '#ff4757' : '#2ed573';
+            });
         });
+        function resetGame() { socket.emit('reset game'); }
 
-        function uploadPhoto() {
-            var file = document.getElementById('photoInput').files[0];
-            var formData = new FormData();
-            formData.append('photo', file);
-            fetch('/upload', { method: 'POST', body: formData });
+        // --- GALLERY ---
+        function upload() {
+            var f = document.getElementById('pInput').files[0];
+            var d = new FormData(); d.append('photo', f);
+            fetch('/upload', { method: 'POST', body: d });
         }
-
-        function addPhotoToGrid(url) {
-            var img = document.createElement('img');
-            img.src = url;
+        socket.on('new photo', url => {
+            var img = document.createElement('img'); img.src = url;
             document.getElementById('gallery-grid').prepend(img);
-        }
-
-        socket.on('new photo', function(url) { addPhotoToGrid(url); });
+        });
     </script>
 </body>
 </html>
