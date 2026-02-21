@@ -11,46 +11,51 @@ const io = new Server(server, { cors: { origin: "*" }, maxHttpBufferSize: 1e8 })
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// OS Memory Storage
+// Game States
 let gameState = Array(9).fill(null);
 let c4State = Array(42).fill(null);
-let tapScore = 50; 
-let plantLevel = 0; 
-let loveLevel = 100; 
-let partnerSleeping = false;
-let locketImage = ""; 
-let partnerBattery = "100%"; 
+let tapScore = 50;
+let qdState = 'idle'; let qdTimeout = null;
+let balloonPumps = 0; let balloonPopped = false; let balloonThreshold = Math.floor(Math.random() * 15) + 5;
+let rpsChoices = {};
+let partnerBattery = "100%";
+let currentWallpaper = "linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)";
 
 let memoryBoard = []; let memoryFlipped = []; let memoryMatched = [];
 function initMemory() { const e = ['🍎','🍎','🍌','🍌','🍇','🍇','🍉','🍉','🍓','🍓','🍒','🍒','🍍','🍍','🥝','🥝']; memoryBoard = e.sort(() => Math.random() - 0.5); memoryFlipped = []; memoryMatched = []; }
 initMemory();
 
-let qdState = 'idle'; let qdTimeout = null;
-let balloonPumps = 0; let balloonPopped = false; let balloonThreshold = Math.floor(Math.random() * 15) + 5; 
+// 🕵️‍♂️ NEW GAME: Odd One Out
+let oddGrid = []; let oddIndex = 0; let oddScores = {};
+function initOdd() {
+    const pairs = [['😀','😃'], ['🍎','🍅'], ['🚗','🚙'], ['🌲','🌳'], ['🐶','🐱'], ['🌕','🌖'], ['🍔','🥪']];
+    let pair = pairs[Math.floor(Math.random() * pairs.length)];
+    oddGrid = Array(25).fill(pair[0]);
+    oddIndex = Math.floor(Math.random() * 25);
+    oddGrid[oddIndex] = pair[1];
+}
+initOdd();
+
 function resetBalloon() { balloonPumps = 0; balloonPopped = false; balloonThreshold = Math.floor(Math.random() * 15) + 5; }
 
-// 🆕 NEW: RPS State
-let rpsChoices = {}; 
-
 io.on('connection', (socket) => {
+    // Sync all states on load
     socket.emit('game update', gameState); socket.emit('c4 update', c4State); socket.emit('tap update', tapScore);
-    socket.emit('plant update', plantLevel); socket.emit('love update', loveLevel); socket.emit('sleep update', partnerSleeping);
-    socket.emit('locket update', locketImage); socket.emit('battery update', partnerBattery);
     socket.emit('memory update', { board: memoryBoard, flipped: memoryFlipped, matched: memoryMatched });
     socket.emit('qd update', qdState); socket.emit('balloon update', { pumps: balloonPumps, popped: balloonPopped });
+    socket.emit('battery update', partnerBattery); socket.emit('wallpaper update', currentWallpaper);
+    socket.emit('odd update', { grid: oddGrid, scores: oddScores });
 
     // System APIs
     socket.on('update battery', (batt) => { partnerBattery = batt; socket.broadcast.emit('battery update', partnerBattery); });
-    socket.on('send buzz', () => { socket.broadcast.emit('receive buzz'); socket.broadcast.emit('notification', `📳 BUZZ! PAY ATTENTION!`); });
-    socket.on('chat message', (data) => { socket.broadcast.emit('chat message', { text: data.text, sender: 'them' }); socket.broadcast.emit('notification', `💬 ${data.text}`); });
+    socket.on('send buzz', () => socket.broadcast.emit('receive buzz'));
+    socket.on('chat message', (data) => socket.broadcast.emit('chat message', { text: data.text, sender: 'them' }));
     socket.on('typing', () => socket.broadcast.emit('typing')); socket.on('stop typing', () => socket.broadcast.emit('stop typing'));
-    socket.on('update locket', (imgData) => { locketImage = imgData; io.emit('locket update', locketImage); socket.broadcast.emit('notification', `🖼️ Updated the Locket!`); });
-    socket.on('send heart', () => { io.emit('show heart'); socket.broadcast.emit('notification', `❤️ Sent you love!`); });
-    socket.on('water plant', () => { plantLevel++; io.emit('plant update', plantLevel); });
-    socket.on('charge love', () => { if(loveLevel < 100) loveLevel += 5; if(loveLevel > 100) loveLevel = 100; io.emit('love update', loveLevel); });
-    socket.on('toggle sleep', (status) => { partnerSleeping = status; socket.broadcast.emit('sleep update', partnerSleeping); let msg = status ? "😴 I'm sleeping!" : "☀️ I'm awake!"; socket.broadcast.emit('notification', msg); });
+    
+    // ⚙️ Settings
+    socket.on('set wallpaper', (bg) => { currentWallpaper = bg; io.emit('wallpaper update', currentWallpaper); });
 
-    // Existing Games
+    // Games
     socket.on('make move', (data) => { gameState[data.index] = data.symbol; io.emit('game update', gameState); });
     socket.on('reset game', () => { gameState = Array(9).fill(null); io.emit('game update', gameState); });
     socket.on('draw', (data) => socket.broadcast.emit('draw', data));
@@ -64,22 +69,18 @@ io.on('connection', (socket) => {
     socket.on('qd tap', () => { if(qdState === 'go') { qdState = 'win'; io.emit('qd update', qdState); setTimeout(() => { qdState = 'idle'; io.emit('qd update', qdState); }, 3000); } else if (qdState === 'wait') { qdState = 'fail'; clearTimeout(qdTimeout); io.emit('qd update', qdState); setTimeout(() => { qdState = 'idle'; io.emit('qd update', qdState); }, 3000); } });
     socket.on('balloon pump', () => { if(balloonPopped) return; balloonPumps++; if(balloonPumps >= balloonThreshold) { balloonPopped = true; io.emit('balloon update', { pumps: balloonPumps, popped: true, popper: socket.id }); } else { io.emit('balloon update', { pumps: balloonPumps, popped: false }); } });
     socket.on('balloon reset', () => { resetBalloon(); io.emit('balloon update', { pumps: balloonPumps, popped: balloonPopped }); });
-
-    // 🆕 NEW: Rock Paper Scissors Logic
-    socket.on('rps pick', (choice) => {
-        rpsChoices[socket.id] = choice;
-        if(Object.keys(rpsChoices).length === 2) {
-            // Both picked! Resolve winner
-            let ids = Object.keys(rpsChoices);
-            let p1 = rpsChoices[ids[0]], p2 = rpsChoices[ids[1]];
-            io.emit('rps result', { id1: ids[0], choice1: p1, id2: ids[1], choice2: p2 });
-            rpsChoices = {}; // Reset for next game
-        } else {
-            // Only one picked, tell the other to hurry up
-            io.emit('rps waiting');
+    socket.on('rps pick', (choice) => { rpsChoices[socket.id] = choice; if(Object.keys(rpsChoices).length === 2) { let ids = Object.keys(rpsChoices); io.emit('rps result', { id1: ids[0], choice1: rpsChoices[ids[0]], id2: ids[1], choice2: rpsChoices[ids[1]] }); rpsChoices = {}; } else { io.emit('rps waiting'); } });
+    socket.on('rps reset', () => { rpsChoices = {}; io.emit('rps clear'); });
+    
+    // Odd One Out Server Logic
+    socket.on('odd tap', (idx) => {
+        if(idx === oddIndex) {
+            oddScores[socket.id] = (oddScores[socket.id] || 0) + 1;
+            initOdd();
+            io.emit('odd update', { grid: oddGrid, scores: oddScores, winner: socket.id });
         }
     });
-    socket.on('rps reset', () => { rpsChoices = {}; io.emit('rps clear'); });
+    socket.on('odd reset', () => { oddScores = {}; initOdd(); io.emit('odd update', { grid: oddGrid, scores: oddScores }); });
 });
 
 const PORT = process.env.PORT || 3000;
