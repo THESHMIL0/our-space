@@ -1,11 +1,15 @@
 {
-  "short_name": "Our Space",
-  "name": "Our Space",
+  "name": "Our Space OS",
+  "short_name": "Our OS",
   "start_url": "/",
   "display": "standalone",
+  "background_color": "#ff9a9e",
   "theme_color": "#ff4757",
-  "background_color": "#ffffff",
   "icons": [
-    { "src": "https://res.cloudinary.com/dfve8uora/image/upload/v1/favicon.png", "sizes": "512x512", "type": "image/png" }
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/833/833472.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ]
 }
