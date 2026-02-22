@@ -9,72 +9,71 @@
     <title>Arcade OS</title>
     <style>
         :root { --primary: #ff4757; --ios-blue: #007aff; }
-        body { font-family: -apple-system, sans-serif; margin: 0; background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); background-size: cover; background-position: center; overflow: hidden; color: #333; height: 100vh; height: 100dvh; display: flex; flex-direction: column; padding-bottom: env(safe-area-inset-bottom); transition: background 0.5s ease; }
+        body { font-family: -apple-system, sans-serif; margin: 0; background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); background-size: cover; background-position: center; overflow: hidden; color: #333; height: 100vh; display: flex; flex-direction: column; transition: background 0.5s ease; }
         
-        /* 🎮 GAME JUICE ANIMATIONS */
+        /* 🎮 PHYSICS & ANIMATIONS */
         @keyframes dropIn { 0% { transform: translateY(-300px); opacity: 0; } 60% { transform: translateY(15px); } 100% { transform: translateY(0); opacity: 1; } }
         .drop-anim { animation: dropIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
         @keyframes pulseTap { 0% { transform: scale(1); } 50% { transform: scale(0.9); } 100% { transform: scale(1); } }
         .pulse-btn:active { animation: pulseTap 0.1s ease; }
-        @keyframes rpsBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-30px); } }
-        .bouncing { animation: rpsBounce 0.6s infinite; }
-        @keyframes victoryDance { 0%, 100% { transform: scale(1) rotate(0deg); } 25% { transform: scale(1.1) rotate(-5deg); } 75% { transform: scale(1.1) rotate(5deg); } }
-        .victory { animation: victoryDance 0.5s ease infinite; }
-        
-        @keyframes shake { 0%, 100% { transform: translate(0, 0); } 20% { transform: translate(-4px, 0); } 40% { transform: translate(2px, -2px); } 60% { transform: translate(-4px, 2px); } }
-        .shake-screen { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
-        .shake-element { animation: shake 0.5s infinite; }
+        @keyframes popIn { 0% { transform: scale(0.3); opacity: 0; } 70% { transform: scale(1.2); } 100% { transform: scale(1); opacity: 1; } }
+        .pop-in { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes shakeErr { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-6px);} 75% {transform: translateX(6px);} }
         .shake-error { animation: shakeErr 0.2s ease-in-out; color: #ff4757 !important; }
         
-        @keyframes fastSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(1080deg); } }
-        .spinning { animation: fastSpin 2s ease-in-out; }
-        @keyframes popIn { 0% { transform: scale(0.3); opacity: 0; } 70% { transform: scale(1.2); } 100% { transform: scale(1); opacity: 1; } }
-        .pop-in { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        /* NEW: Unread Badge */
+        .notification-badge { position: absolute; top: -5px; right: -5px; background: #ff4757; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: none; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3); z-index: 10;}
 
-        /* UI LAYOUT */
-        #status-bar { display: flex; justify-content: space-between; padding: 12px 25px 2px 25px; font-weight: 600; color: white; font-size: 14px; padding-top: calc(12px + env(safe-area-inset-top)); text-shadow: 0px 1px 4px rgba(0,0,0,0.8); }
-        
-        #home-screen { flex: 1; padding: 25px 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px 10px; align-content: center; overflow: hidden; }
+        /* UI LAYOUT: 15 App Grid (Tightly packed so no scrolling) */
+        #status-bar { display: flex; justify-content: space-between; padding: 10px 25px 0 25px; font-weight: 600; color: white; font-size: 14px; padding-top: calc(10px + env(safe-area-inset-top)); text-shadow: 0px 1px 4px rgba(0,0,0,0.8); }
+        #home-screen { flex: 1; padding: 10px 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px 10px; align-content: center; overflow: hidden; }
         .home-app { display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
-        .home-icon { width: 70px; height: 70px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 38px; box-shadow: 0 6px 15px rgba(0,0,0,0.25); margin-bottom: 8px; transition: 0.2s; border: none; }
+        .home-icon { width: 62px; height: 62px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 6px 15px rgba(0,0,0,0.25); margin-bottom: 5px; transition: 0.2s; border: none; }
         .home-icon:active { transform: scale(0.85); }
-        .app-label { font-size: 13px; font-weight: 700; color: white; text-align: center; text-shadow: 0px 1px 4px rgba(0,0,0,0.9), 0px 0px 2px rgba(0,0,0,0.6); letter-spacing: 0.3px; white-space: nowrap; }
+        .app-label { font-size: 12px; font-weight: 700; color: white; text-align: center; text-shadow: 0px 1px 4px rgba(0,0,0,0.9), 0px 0px 2px rgba(0,0,0,0.6); letter-spacing: 0.3px; white-space: nowrap; }
 
-        #dock { background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(30px); margin: 5px 20px 25px 20px; border-radius: 35px; padding: 12px; display: flex; justify-content: space-around; border: none; box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
-        .dock-icon { width: 55px; height: 55px; background: white; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 5px 12px rgba(0,0,0,0.2); transition: 0.2s; border: none; }
+        #dock { background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(30px); margin: 5px 20px 20px 20px; border-radius: 35px; padding: 12px; display: flex; justify-content: space-around; border: none; box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+        .dock-icon { width: 55px; height: 55px; background: white; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 5px 12px rgba(0,0,0,0.2); transition: 0.2s; border: none; position: relative; }
         .dock-icon:active { transform: scale(0.85); }
 
         /* WINDOWS & CHAT */
         .app-window { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f2f2f7; display: none; flex-direction: column; z-index: 100; animation: slideUp 0.3s ease-out; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .app-header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; background: white; border: none; box-shadow: 0 1px 5px rgba(0,0,0,0.05); font-weight: 600; font-size: 18px; padding-top: calc(15px + env(safe-area-inset-top)); flex-shrink: 0; z-index: 10; }
+        .app-header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; background: white; font-weight: 600; font-size: 18px; padding-top: calc(15px + env(safe-area-inset-top)); flex-shrink: 0; z-index: 10; }
         .done-btn { color: var(--ios-blue); cursor: pointer; font-size: 17px; }
         .app-content-centered { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; background: white; overflow-y: auto; }
 
         .chat-container { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; background: #f8f9fa; }
-        .bubble { max-width: 80%; padding: 12px 16px; border-radius: 20px; font-size: 15px; position: relative; line-height:1.4; }
+        .bubble { max-width: 80%; padding: 10px 15px; border-radius: 18px; font-size: 15px; position: relative; line-height:1.4; }
         .me { align-self: flex-end; background: linear-gradient(135deg, #007aff, #0056b3); color: white; border-bottom-right-radius: 4px; box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2); }
         .them { align-self: flex-start; background: #e9e9eb; color: black; border-bottom-left-radius: 4px; }
-        .msg-time { display: block; font-size: 10px; opacity: 0.6; margin-top: 4px; text-align: right; }
+        .chat-name { font-size: 10px; opacity: 0.5; margin-bottom: 2px; font-weight: bold; }
+        .msg-time { display: block; font-size: 9px; opacity: 0.6; margin-top: 4px; text-align: right; }
         .input-area { padding: 12px; border-top: 1px solid #eee; display: flex; gap: 10px; background: white; padding-bottom: calc(12px + env(safe-area-inset-bottom)); flex-shrink: 0; }
         .chat-input { flex: 1; padding: 12px 20px; border-radius: 25px; border: 1px solid #ddd; outline: none; font-size: 16px; }
         .game-btn { display:inline-block; margin: 10px auto; padding: 15px 35px; border-radius: 30px; border: none; background: #2f3542; color: white; font-weight: bold; font-size: 18px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: 0.2s; }
-        .game-btn:active { transform: scale(0.95); }
+        
+        /* 🐹 Mole Game */
+        #mole-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 260px; margin: 20px auto; }
+        .mole-hole { width: 80px; height: 80px; background: #8e44ad; border-radius: 50%; box-shadow: inset 0 10px 20px rgba(0,0,0,0.6); position: relative; overflow: hidden; }
+        .mole { font-size: 50px; position: absolute; bottom: -80px; left: 10px; transition: bottom 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
+        .mole.active { bottom: 5px; }
 
-        /* GAME GRIDS */
+        /* 🎡 Wheel Game */
+        #wheel-container { width: 280px; height: 280px; border-radius: 50%; border: 5px solid #333; position: relative; margin: 20px auto; overflow: hidden; transition: transform 4s cubic-bezier(0.1, 0.9, 0.2, 1); background: conic-gradient(#ff4757 0% 12.5%, #ffa502 12.5% 25%, #2ed573 25% 37.5%, #1e90ff 37.5% 50%, #9b59b6 50% 62.5%, #ff4757 62.5% 75%, #ffa502 75% 87.5%, #2ed573 87.5% 100%); }
+        #wheel-pointer { font-size: 40px; position: absolute; top: -20px; z-index: 10; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+
+        /* Existing Grids */
         #mem-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 280px; margin: 15px auto; }
         .mem-card { width: 60px; height: 60px; background: var(--ios-blue); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; color: transparent; transition: 0.3s; box-shadow: 0 4px 8px rgba(0,0,0,0.1);}
         .mem-card.flipped { background: white; color: black; transform: rotateY(180deg); }
         .mem-card.matched { background: #e0e0e0; color: black; opacity: 0.6; }
         #odd-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin: 20px auto; width: max-content; }
         .odd-cell { width: 50px; height: 50px; font-size: 35px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.05); border-radius: 12px; cursor: pointer; }
-        
         #ttt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 250px; margin: 15px auto 25px auto; }
         .cell { width: 75px; height: 75px; background: #2f3542; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: bold; cursor: pointer; box-shadow: inset 0 -4px 0 rgba(0,0,0,0.4), 0 5px 12px rgba(0,0,0,0.2); transition: 0.1s; }
         .cell:active { transform: translateY(4px); box-shadow: inset 0 0 0 rgba(0,0,0,0.4), 0 2px 5px rgba(0,0,0,0.2); }
         .winning-cell { background: #eccc68 !important; transform: scale(1.05) !important; box-shadow: 0 0 20px rgba(236, 204, 104, 0.9) !important; z-index: 10; animation: pulseTap 0.5s infinite alternate; }
-
         #c4-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; background: linear-gradient(135deg, #2980b9, #2c3e50); padding: 10px; border-radius: 15px; margin: 15px auto; box-shadow: 0 8px 20px rgba(0,0,0,0.3); width: max-content; }
         .c4-cell { width: 35px; height: 35px; background: #1a252f; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: inset 0 3px 6px rgba(0,0,0,0.6); position: relative; overflow: hidden; }
         .chip-red { width: 100%; height: 100%; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #ff4d4d, #c0392b); box-shadow: 0 3px 6px rgba(0,0,0,0.4); position: absolute; }
@@ -101,23 +100,53 @@
         <div class="home-app" onclick="openGameApp('lovedice', 'Love Dice')"><div class="home-icon" style="background: linear-gradient(135deg, #f43b47 0%, #453a94 100%);">💘</div><div class="app-label">Love Dice</div></div>
         
         <div class="home-app" onclick="openGameApp('coin', 'Coin Flip')"><div class="home-icon" style="background: linear-gradient(135deg, #fceabb 0%, #f8b500 100%);">🪙</div><div class="app-label">Coin Flip</div></div>
-        <div class="home-app" onclick="openGameApp('odd', 'Odd One Out')"><div class="home-icon" style="background: linear-gradient(135deg, #f12711 0%, #f5af19 100%);">🕵️‍♂️</div><div class="app-label">Odd One Out</div></div>
+        <div class="home-app" onclick="openGameApp('odd', 'Odd One Out')"><div class="home-icon" style="background: linear-gradient(135deg, #f12711 0%, #f5af19 100%);">🕵️‍♂️</div><div class="app-label">Odd Emoji</div></div>
         <div class="home-app" onclick="openGameApp('draw', 'Drawing Canvas')"><div class="home-icon" style="background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);">🎨</div><div class="app-label">Draw</div></div>
+
+        <div class="home-app" onclick="openGameApp('mole', 'Whack-a-Mole')"><div class="home-icon" style="background: linear-gradient(135deg, #8e44ad 0%, #c0392b 100%);">🐹</div><div class="app-label">Whack-a-Mole</div></div>
+        <div class="home-app" onclick="openGameApp('math', 'Math Race')"><div class="home-icon" style="background: linear-gradient(135deg, #2980b9 0%, #6dd5ed 100%);">🧮</div><div class="app-label">Math Race</div></div>
+        <div class="home-app" onclick="openGameApp('wheel', 'Spin The Wheel')"><div class="home-icon" style="background: linear-gradient(135deg, #f12711 0%, #f5af19 100%);">🎡</div><div class="app-label">Spin Wheel</div></div>
     </div>
 
     <div id="dock">
-        <div class="dock-icon" onclick="openApp('messageApp')">💬</div>
+        <div class="dock-icon" onclick="openApp('messageApp')">💬<div id="chat-badge" class="notification-badge">1</div></div>
         <div class="dock-icon" onclick="socket.emit('send buzz')" style="background: #f1c40f;">📳</div>
         <div class="dock-icon" onclick="openApp('settingsApp')" style="background: #333; color: white;">⚙️</div>
     </div>
-    <div id="settingsApp" class="app-window"><div class="app-header"><div style="width:40px;"></div><span class="app-title">Settings</span><span class="done-btn" onclick="closeApp('settingsApp')">Done</span></div><div class="app-content-centered"><div style="font-size: 70px; margin-bottom: 15px;">⚙️</div><h3 style="margin-top:0;">Theme & Wallpaper</h3><p style="color:#666; font-size:14px; margin-bottom:25px;">Changes the background for both players live.</p><div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; width:100%; margin-bottom:20px;"><button class="game-btn pulse-btn" style="margin:0; width:100%; background:linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); color:black;" onclick="socket.emit('set wallpaper', 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)')">Pink Glass</button><button class="game-btn pulse-btn" style="margin:0; width:100%; background:linear-gradient(135deg, #232526 0%, #414345 100%);" onclick="socket.emit('set wallpaper', 'linear-gradient(135deg, #232526 0%, #414345 100%)')">Dark Mode</button><button class="game-btn pulse-btn" style="margin:0; width:100%; background:linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color:black;" onclick="socket.emit('set wallpaper', 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)')">Ocean Blue</button><button class="game-btn pulse-btn" style="margin:0; width:100%; background:linear-gradient(135deg, #11998e 0%, #38ef7d 100%);" onclick="socket.emit('set wallpaper', 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)')">Forest Green</button></div><p style="font-weight:bold; margin-bottom:10px;">Or Paste Image URL:</p><input id="bg-input" class="chat-input" placeholder="https://..." style="width:80%; margin-bottom:20px; text-align:center;" /><button class="game-btn pulse-btn" onclick="let u = document.getElementById('bg-input').value; if(u){ socket.emit('set wallpaper', `url('${u}')`); document.getElementById('bg-input').value=''; closeApp('settingsApp'); }">Set Custom Image</button></div></div>
+    <div id="settingsApp" class="app-window"><div class="app-header"><div style="width:40px;"></div><span class="app-title">Settings</span><span class="done-btn" onclick="closeApp('settingsApp')">Done</span></div><div class="app-content-centered"><div style="font-size: 60px; margin-bottom: 10px;">⚙️</div><h3 style="margin-top:0;">Profile</h3><input id="nickname-input" class="chat-input" placeholder="Enter your Nickname..." style="width:80%; margin-bottom:10px; text-align:center;" /><button class="game-btn pulse-btn" onclick="let n = document.getElementById('nickname-input').value; if(n){ socket.emit('set nickname', n); alert('Nickname updated!'); }">Save Name</button><hr style="width:100%; border:0; border-top:1px solid #ddd; margin:20px 0;"><h3 style="margin-top:0;">Theme & Wallpaper</h3><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; width:100%; margin-bottom:20px;"><button class="game-btn pulse-btn" style="margin:0; width:100%; background:linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); color:black;" onclick="socket.emit('set wallpaper', 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)')">Pink Glass</button><button class="game-btn pulse-btn" style="margin:0; width:100%; background:linear-gradient(135deg, #232526 0%, #414345 100%);" onclick="socket.emit('set wallpaper', 'linear-gradient(135deg, #232526 0%, #414345 100%)')">Dark Mode</button></div></div></div>
     
     <div id="messageApp" class="app-window"><div class="app-header"><div style="width:40px;"></div><span class="app-title">Main Chat</span><span class="done-btn" onclick="closeApp('messageApp')">Done</span></div><div id="main-chat-box" class="chat-container"></div><div class="input-area"><input id="main-chat-input" class="chat-input" placeholder="iMessage" oninput="handleTyping('main')" /><button class="pulse-btn" onclick="sendMsg('main')" style="background:var(--ios-blue); color:white; border:none; border-radius:50%; width:45px; height:45px; font-size:20px;">↑</button></div></div>
 
     <div id="gamesApp" class="app-window">
         <div class="app-header"><div style="width:40px;"></div><span id="game-title" class="app-title">Game</span><span class="done-btn" onclick="closeApp('gamesApp')">Back</span></div>
-        <div id="game-screens" style="flex:1; overflow-y:auto; background:white; position:relative;">
+        <div id="game-screens" style="flex:1; overflow-y:auto; background:white; position:relative; display:flex; align-items:center; justify-content:center;">
             
+            <div id="screen-mole" class="app-content-centered" style="display:none; position:absolute; top:0; left:0; right:0; bottom:0;">
+                <h2 style="margin-top:0;">Whack-a-Mole!</h2>
+                <h3 style="color:#ff4757;">Score: <span id="mole-score">0</span></h3>
+                <div id="mole-grid">
+                    <div class="mole-hole"><div class="mole" onclick="socket.emit('mole hit', 0)">🐹</div></div><div class="mole-hole"><div class="mole" onclick="socket.emit('mole hit', 1)">🐹</div></div><div class="mole-hole"><div class="mole" onclick="socket.emit('mole hit', 2)">🐹</div></div>
+                    <div class="mole-hole"><div class="mole" onclick="socket.emit('mole hit', 3)">🐹</div></div><div class="mole-hole"><div class="mole" onclick="socket.emit('mole hit', 4)">🐹</div></div><div class="mole-hole"><div class="mole" onclick="socket.emit('mole hit', 5)">🐹</div></div>
+                    <div class="mole-hole"><div class="mole" onclick="socket.emit('mole hit', 6)">🐹</div></div><div class="mole-hole"><div class="mole" onclick="socket.emit('mole hit', 7)">🐹</div></div><div class="mole-hole"><div class="mole" onclick="socket.emit('mole hit', 8)">🐹</div></div>
+                </div>
+                <button class="game-btn pulse-btn" onclick="socket.emit('mole start')">Start Game</button>
+            </div>
+
+            <div id="screen-math" class="app-content-centered" style="display:none; position:absolute; top:0; left:0; right:0; bottom:0;">
+                <h2 style="margin-top:0;">Fastest Math Wins!</h2>
+                <h3 style="color:#ff4757;">Score: <span id="math-score">0</span></h3>
+                <div id="math-question" style="font-size: 50px; font-weight: bold; margin: 20px 0;">? + ? = ?</div>
+                <div style="display:flex; gap:10px;"><input id="math-input" type="number" class="chat-input" placeholder="Answer..." style="text-align:center; font-size:24px; width:100px;" /><button class="game-btn pulse-btn" style="margin:0;" onclick="socket.emit('math guess', document.getElementById('math-input').value); document.getElementById('math-input').value='';">Submit</button></div>
+                <button class="game-btn pulse-btn" style="background:#888; margin-top:30px;" onclick="socket.emit('math start')">Start Race</button>
+            </div>
+
+            <div id="screen-wheel" class="app-content-centered" style="display:none; position:absolute; top:0; left:0; right:0; bottom:0;">
+                <h2 style="margin-top:0;">Spin for fate!</h2>
+                <div id="wheel-pointer">👇</div>
+                <div id="wheel-container"></div>
+                <button class="game-btn pulse-btn" style="background:#f1c40f; color:black; padding: 20px 50px; font-size: 24px;" onclick="socket.emit('spin wheel')">SPIN</button>
+            </div>
+
             <div id="screen-odd" class="app-content-centered" style="display:none; position:absolute; top:0; left:0; right:0; bottom:0;"><h2 style="margin-top:0;">Find the Odd Emoji!</h2><h3 style="color:#ff4757;">Your Score: <span id="odd-score">0</span></h3><div id="odd-grid"></div><button class="game-btn pulse-btn" onclick="socket.emit('odd reset')">Reset Scores</button></div>
             <div id="screen-rps" class="app-content-centered" style="display:none; position:absolute; top:0; left:0; right:0; bottom:0;"><h2 id="rps-status" style="margin-top:0; font-size: 28px;">Pick your weapon!</h2><div id="rps-showdown" style="font-size: 90px; display:none; margin: 25px 0;" class="bouncing">✊</div><div id="rps-controls" style="display:flex; gap:15px; margin-top:15px;"><button class="game-btn pulse-btn" style="background:#34495e; font-size:30px; padding:20px;" onclick="pickRPS('👊')">👊</button><button class="game-btn pulse-btn" style="background:#34495e; font-size:30px; padding:20px;" onclick="pickRPS('📄')">📄</button><button class="game-btn pulse-btn" style="background:#34495e; font-size:30px; padding:20px;" onclick="pickRPS('✌️')">✌️</button></div><button class="game-btn pulse-btn" style="margin-top:30px; background:#ff4757;" onclick="socket.emit('rps reset')">Reset Round</button></div>
             <div id="screen-dice" class="app-content-centered" style="display:none; position:absolute; top:0; left:0; right:0; bottom:0;"><div style="font-size: 90px; margin-bottom: 20px;" class="shake-element">🎲</div><h3 style="color:#666;">High Roller Wins!</h3><button class="game-btn pulse-btn" style="background:#1e90ff; padding:20px 60px; font-size:20px;" onclick="rollDice()">ROLL DICE</button></div>
@@ -127,51 +156,10 @@
             <div id="screen-qd" class="app-content-centered" style="display:none; position:absolute; top:0; left:0; right:0; bottom:0;"><h2 id="qd-status" style="margin-top:0;">Reaction Test!</h2><button id="qd-btn" class="pulse-btn" style="width:200px; height:200px; border-radius:50%; font-size:30px; border:none; color:white; background:#333; margin:25px auto; transition:0.1s;" onclick="socket.emit('qd start')">START</button></div>
             <div id="screen-balloon" class="app-content-centered" style="display:none; position:absolute; top:0; left:0; right:0; bottom:0;"><h3 style="margin-top:0;">Don't pop it!</h3><div style="height: 220px; display:flex; align-items:center; justify-content:center;"><div id="balloon-emoji" style="font-size: 60px;">🎈</div></div><h2 id="balloon-status" style="margin: 10px 0;"></h2><button id="balloon-btn" class="game-btn pulse-btn" style="background:#ff4757; padding:20px 60px; font-size:20px;" onclick="socket.emit('balloon pump')">PUMP AIR</button><button class="game-btn pulse-btn" style="background:#333; margin-top:20px;" onclick="socket.emit('balloon reset')">New Balloon</button></div>
             
+            <div id="screen-c4" class="app-content-centered" style="display:none; position:absolute; top:0; left:0; right:0; bottom:0;"><div id="c4-team-select" style="width:100%; text-align:center;"><h2 style="margin-top:0;">Choose your color!</h2><div style="display:flex; gap:15px; justify-content:center;"><button class="game-btn pulse-btn" style="background:#e74c3c; font-size: 24px; padding: 20px 40px;" onclick="joinC4('🔴')">Play 🔴</button><button class="game-btn pulse-btn" style="background:#f1c40f; color:black; font-size: 24px; padding: 20px 40px;" onclick="joinC4('🟡')">Play 🟡</button></div></div><div id="c4-game-area" style="display:none; width:100%;"><h3 id="c4-status" style="margin-top:0; transition:0.2s;">🔴 Red's Turn</h3><h4 id="c4-my-role" style="color:#888; margin-top:-10px;">You are: </h4><div id="c4-grid"></div><button class="game-btn pulse-btn" onclick="socket.emit('c4 reset')">Restart Board</button><button class="game-btn pulse-btn" style="background:#888;" onclick="leaveC4()">Change Team</button></div></div>
             <div id="screen-tap" class="app-content-centered" style="display:none; position:absolute; top:0; left:0; right:0; bottom:0;"><h2 style="margin-top:0;">Tug of War</h2><div style="width: 90%; height: 30px; background: #1e90ff; border-radius: 15px; overflow: hidden; margin: 20px 0; box-shadow: inset 0 4px 8px rgba(0,0,0,0.3);"><div id="tap-bar-red" style="height: 100%; width: 50%; background: #ff4757; transition: width 0.1s;"></div></div><div id="tap-team-select" style="display:flex; gap:15px;"><button class="game-btn pulse-btn" style="background:#ff4757; padding:15px 35px;" onclick="joinTap('red')">RED</button><button class="game-btn pulse-btn" style="background:#1e90ff; padding:15px 35px;" onclick="joinTap('blue')">BLUE</button></div><button id="tap-btn" class="game-btn pulse-btn" style="display:none; width:200px; height:200px; border-radius:50%; font-size:35px;" onclick="pullTap()">TAP!</button><button id="tap-reset-btn" class="game-btn pulse-btn" style="display:none;" onclick="socket.emit('tap reset')">Play Again</button></div>
-            
-            <div id="screen-c4" class="app-content-centered" style="display:none; position:absolute; top:0; left:0; right:0; bottom:0;">
-                <div id="c4-team-select" style="width:100%; text-align:center;">
-                    <h2 style="margin-top:0;">Choose your color!</h2>
-                    <div style="display:flex; gap:15px; justify-content:center;">
-                        <button class="game-btn pulse-btn" style="background:#e74c3c; font-size: 24px; padding: 20px 40px;" onclick="joinC4('🔴')">Play 🔴</button>
-                        <button class="game-btn pulse-btn" style="background:#f1c40f; color:black; font-size: 24px; padding: 20px 40px;" onclick="joinC4('🟡')">Play 🟡</button>
-                    </div>
-                </div>
-                <div id="c4-game-area" style="display:none; width:100%;">
-                    <h3 id="c4-status" style="margin-top:0; transition:0.2s;">🔴 Red's Turn</h3>
-                    <h4 id="c4-my-role" style="color:#888; margin-top:-10px;">You are: </h4>
-                    <div id="c4-grid"></div>
-                    <button class="game-btn pulse-btn" onclick="socket.emit('c4 reset')">Restart Board</button>
-                    <button class="game-btn pulse-btn" style="background:#888;" onclick="leaveC4()">Change Team</button>
-                </div>
-            </div>
-
-            <div id="screen-ttt" class="app-content-centered" style="display:none; position:absolute; top:0; left:0; right:0; bottom:0;">
-                <div id="ttt-team-select" style="width:100%; text-align:center;">
-                    <h2 style="margin-top:0;">Choose your side!</h2>
-                    <div style="display:flex; gap:15px; justify-content:center;">
-                        <button class="game-btn pulse-btn" style="background:#ff4757; font-size: 24px; padding: 20px 40px;" onclick="joinTTT('X')">Play ❌</button>
-                        <button class="game-btn pulse-btn" style="background:#00f2fe; color:black; font-size: 24px; padding: 20px 40px;" onclick="joinTTT('O')">Play ⭕</button>
-                    </div>
-                </div>
-                <div id="ttt-game-area" style="display:none; width:100%;">
-                    <h2 id="ttt-status" style="margin-top:0; transition:0.2s;">❌'s Turn</h2>
-                    <h4 id="ttt-my-role" style="color:#888; margin-top:-10px;">You are: </h4>
-                    <div id="ttt-grid">
-                        <div class="cell pulse-btn" onclick="makeMove(0)"></div><div class="cell pulse-btn" onclick="makeMove(1)"></div><div class="cell pulse-btn" onclick="makeMove(2)"></div>
-                        <div class="cell pulse-btn" onclick="makeMove(3)"></div><div class="cell pulse-btn" onclick="makeMove(4)"></div><div class="cell pulse-btn" onclick="makeMove(5)"></div>
-                        <div class="cell pulse-btn" onclick="makeMove(6)"></div><div class="cell pulse-btn" onclick="makeMove(7)"></div><div class="cell pulse-btn" onclick="makeMove(8)"></div>
-                    </div>
-                    <button class="game-btn pulse-btn" onclick="socket.emit('reset game')">Restart Board</button>
-                    <button class="game-btn pulse-btn" style="background:#888;" onclick="leaveTTT()">Change Team</button>
-                </div>
-            </div>
-
-            <div id="screen-draw" class="app-content-centered" style="display:none; position:absolute; top:0; left:0; right:0; bottom:0;">
-                <div style="display:flex; gap:15px; margin-bottom:15px; align-items:center;"><input type="color" id="color-picker" value="#ff4757" style="width:40px; height:40px; border:none;" onchange="setBrush(this.value)"><button class="game-btn pulse-btn" style="background:white; color:black; border:1px solid #ccc; margin:0;" onclick="setBrush('#ffffff')">Eraser</button></div>
-                <div style="margin-bottom:15px; font-weight:bold;">Thickness: <input type="range" id="brush-size" min="2" max="20" value="4" onchange="updateSize(this.value)"></div>
-                <canvas id="draw-board" width="280" height="280" style="border-radius:15px; box-shadow:0 4px 15px rgba(0,0,0,0.1);"></canvas><button class="game-btn pulse-btn" onclick="clearCanvas()">Erase All</button>
-            </div>
+            <div id="screen-ttt" class="app-content-centered" style="display:none; position:absolute; top:0; left:0; right:0; bottom:0;"><div id="ttt-team-select" style="width:100%; text-align:center;"><h2 style="margin-top:0;">Choose your side!</h2><div style="display:flex; gap:15px; justify-content:center;"><button class="game-btn pulse-btn" style="background:#ff4757; font-size: 24px; padding: 20px 40px;" onclick="joinTTT('X')">Play ❌</button><button class="game-btn pulse-btn" style="background:#00f2fe; color:black; font-size: 24px; padding: 20px 40px;" onclick="joinTTT('O')">Play ⭕</button></div></div><div id="ttt-game-area" style="display:none; width:100%;"><h2 id="ttt-status" style="margin-top:0; transition:0.2s;">❌'s Turn</h2><h4 id="ttt-my-role" style="color:#888; margin-top:-10px;">You are: </h4><div id="ttt-grid"><div class="cell pulse-btn" onclick="makeMove(0)"></div><div class="cell pulse-btn" onclick="makeMove(1)"></div><div class="cell pulse-btn" onclick="makeMove(2)"></div><div class="cell pulse-btn" onclick="makeMove(3)"></div><div class="cell pulse-btn" onclick="makeMove(4)"></div><div class="cell pulse-btn" onclick="makeMove(5)"></div><div class="cell pulse-btn" onclick="makeMove(6)"></div><div class="cell pulse-btn" onclick="makeMove(7)"></div><div class="cell pulse-btn" onclick="makeMove(8)"></div></div><button class="game-btn pulse-btn" onclick="socket.emit('reset game')">Restart Board</button><button class="game-btn pulse-btn" style="background:#888;" onclick="leaveTTT()">Change Team</button></div></div>
+            <div id="screen-draw" class="app-content-centered" style="display:none; position:absolute; top:0; left:0; right:0; bottom:0;"><div style="display:flex; gap:15px; margin-bottom:15px; align-items:center;"><input type="color" id="color-picker" value="#ff4757" style="width:40px; height:40px; border:none;" onchange="setBrush(this.value)"><button class="game-btn pulse-btn" style="background:white; color:black; border:1px solid #ccc; margin:0;" onclick="setBrush('#ffffff')">Eraser</button></div><div style="margin-bottom:15px; font-weight:bold;">Thickness: <input type="range" id="brush-size" min="2" max="20" value="4" onchange="updateSize(this.value)"></div><canvas id="draw-board" width="280" height="280" style="border-radius:15px; box-shadow:0 4px 15px rgba(0,0,0,0.1);"></canvas><button class="game-btn pulse-btn" onclick="clearCanvas()">Erase All</button></div>
         </div>
         
         <div id="game-chat-box" class="chat-container" style="background: #eef2f5; height: 160px; flex:none; border-top: 1px solid #ddd;"></div>
@@ -181,74 +169,88 @@
     <script>
         var socket = io();
         setInterval(() => { const now = new Date(); let h = now.getHours(); let m = now.getMinutes(); document.getElementById('clock').innerText = (h % 12 || 12) + ':' + (m < 10 ? '0'+m : m); }, 1000);
-        function openApp(id) { document.getElementById(id).style.display = 'flex'; }
+        function openApp(id) { 
+            document.getElementById(id).style.display = 'flex'; 
+            if(id === 'messageApp') document.getElementById('chat-badge').style.display = 'none'; // Hide badge when opened
+        }
         function closeApp(id) { document.getElementById(id).style.display = 'none'; }
-        function openGameApp(gameId, title) { document.getElementById('game-title').innerText = title; ['ttt', 'draw', 'c4', 'tap', 'mem', 'qd', 'balloon', 'rps', 'dice', 'lovedice', 'coin', 'odd'].forEach(id => document.getElementById('screen-' + id).style.display = 'none'); document.getElementById('screen-' + gameId).style.display = 'flex'; openApp('gamesApp'); }
+        function openGameApp(gameId, title) { document.getElementById('game-title').innerText = title; ['ttt', 'draw', 'c4', 'tap', 'mem', 'qd', 'balloon', 'rps', 'dice', 'lovedice', 'coin', 'odd', 'mole', 'math', 'wheel'].forEach(id => document.getElementById('screen-' + id).style.display = 'none'); document.getElementById('screen-' + gameId).style.display = 'flex'; openApp('gamesApp'); }
 
         socket.on('wallpaper update', bg => { document.body.style.background = bg; document.body.style.backgroundSize = "cover"; document.body.style.backgroundPosition = "center"; });
         if ('getBattery' in navigator) { navigator.getBattery().then(function(battery) { function updateBattery() { socket.emit('update battery', Math.round(battery.level * 100) + "% " + (battery.charging ? "⚡" : "🔋")); } updateBattery(); battery.addEventListener('levelchange', updateBattery); }); }
         socket.on('battery update', (batt) => { document.getElementById('partner-battery-display').innerText = batt; });
         socket.on('receive buzz', () => { document.body.classList.add('shake-screen'); setTimeout(() => { document.body.classList.remove('shake-screen'); }, 500); if(navigator.vibrate) navigator.vibrate([500,200,500]); });
 
-        function sendMsg(type) { const input = document.getElementById(type + '-chat-input'); if(!input.value) return; addBubble(type, input.value, 'me'); socket.emit(type + ' message', {text: input.value}); input.value = ''; socket.emit('stop typing', type); }
-        function addBubble(type, text, sender) { const now = new Date(); let timeStr = (now.getHours() % 12 || 12) + ':' + (now.getMinutes() < 10 ? '0' + now.getMinutes() : now.getMinutes()); let div = document.createElement('div'); div.className = 'bubble ' + sender; div.innerHTML = text.replace(/\n/g, '<br>') + `<span class="msg-time">${timeStr}</span>`; let box = document.getElementById(type + '-chat-box'); if(box) { box.appendChild(div); box.scrollTop = box.scrollHeight; } document.querySelectorAll('.' + type + '-typing').forEach(b => b.remove()); }
-        socket.on('main message', d => addBubble('main', d.text, 'them')); socket.on('game message', d => addBubble('game', d.text, 'them'));
+        // UPGRADED CHAT (WITH NICKNAMES & BADGES)
+        function sendMsg(type) { const input = document.getElementById(type + '-chat-input'); if(!input.value) return; addBubble(type, input.value, 'me', "You"); socket.emit(type + ' message', {text: input.value}); input.value = ''; socket.emit('stop typing', type); }
+        function addBubble(type, text, sender, name) { const now = new Date(); let timeStr = (now.getHours() % 12 || 12) + ':' + (now.getMinutes() < 10 ? '0' + now.getMinutes() : now.getMinutes()); let div = document.createElement('div'); div.className = 'bubble ' + sender; div.innerHTML = (name ? `<div class="chat-name">${name}</div>` : '') + text.replace(/\n/g, '<br>') + `<span class="msg-time">${timeStr}</span>`; let box = document.getElementById(type + '-chat-box'); if(box) { box.appendChild(div); box.scrollTop = box.scrollHeight; } document.querySelectorAll('.' + type + '-typing').forEach(b => b.remove()); }
+        socket.on('main message', d => { 
+            addBubble('main', d.text, 'them', d.name); 
+            if(document.getElementById('messageApp').style.display !== 'flex') { document.getElementById('chat-badge').style.display = 'flex'; if(navigator.vibrate) navigator.vibrate(100); }
+        });
+        socket.on('game message', d => addBubble('game', d.text, 'them', d.name));
         let typingTimers = { main: null, game: null }; function handleTyping(type) { socket.emit(type + ' typing'); clearTimeout(typingTimers[type]); typingTimers[type] = setTimeout(() => socket.emit('stop typing', type), 1500); }
         socket.on('main typing', () => { if (!document.getElementById('main-typing-indicator')) { let div = document.createElement('div'); div.id = 'main-typing-indicator'; div.className = 'bubble them typing-bubble main-typing'; div.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>'; let box = document.getElementById('main-chat-box'); if(box){ box.appendChild(div); box.scrollTop = box.scrollHeight; } } });
         socket.on('game typing', () => { if (!document.getElementById('game-typing-indicator')) { let div = document.createElement('div'); div.id = 'game-typing-indicator'; div.className = 'bubble them typing-bubble game-typing'; div.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>'; let box = document.getElementById('game-chat-box'); if(box){ box.appendChild(div); box.scrollTop = box.scrollHeight; } } });
         socket.on('stop typing', (type) => { let indicator = document.getElementById(type+'-typing-indicator'); if (indicator) indicator.remove(); });
-        function sendGameBotMsg(msg) { addBubble('game', msg, 'me'); socket.emit('game message', {text: msg}); }
+        function sendGameBotMsg(msg) { addBubble('game', msg, 'me', "Game Bot"); socket.emit('game message', {text: msg}); }
 
+        // 🐹 NEW: WHACK A MOLE
+        socket.on('mole update', data => {
+            document.getElementById('mole-score').innerText = data.scores[socket.id] || 0;
+            const moles = document.querySelectorAll('.mole');
+            moles.forEach((m, i) => { if(i === data.active) m.classList.add('active'); else m.classList.remove('active'); });
+        });
+
+        // 🧮 NEW: MATH RACE
+        socket.on('math update', data => {
+            document.getElementById('math-question').innerText = data.q;
+            document.getElementById('math-score').innerText = data.scores[socket.id] || 0;
+            if(data.winner) { sendGameBotMsg(`🧮 **Math Race:** ${data.winner} got it right!`); }
+        });
+        socket.on('math wrong', () => { document.getElementById('math-question').classList.add('shake-error'); setTimeout(() => { document.getElementById('math-question').classList.remove('shake-error'); }, 300); });
+
+        // 🎡 NEW: SPIN WHEEL
+        socket.on('wheel spun', deg => {
+            let w = document.getElementById('wheel-container');
+            w.style.transform = `rotate(${deg}deg)`;
+            setTimeout(() => { sendGameBotMsg(`🎡 **Wheel Spin:** Finished spinning!`); }, 4000);
+        });
+
+        // ODD ONE OUT
         socket.on('odd update', data => { const grid = document.getElementById('odd-grid'); grid.innerHTML = ''; document.getElementById('odd-score').innerText = data.scores[socket.id] || 0; data.grid.forEach((emoji, i) => { let cell = document.createElement('div'); cell.className = 'odd-cell pulse-btn'; cell.innerText = emoji; cell.onclick = () => socket.emit('odd tap', i); grid.appendChild(cell); }); });
+
+        // RANDOM GAMES
         function rollDice() { let roll = Math.floor(Math.random() * 6) + 1; sendGameBotMsg(`🎲 **Dice Battle!**\nI rolled a **${roll}**! Beat that!`); }
         const loveActions = ["Kiss 💋", "Massage 💆", "Lick 👅", "Bite 🧛", "Tickle 🪶", "Hug 🤗"]; const loveLocations = ["Neck 🦒", "Lips 👄", "Back 🔙", "Ear 👂", "Cheek ☺️", "Hand ✋"]; function rollLoveDice() { let a = loveActions[Math.floor(Math.random() * loveActions.length)]; let l = loveLocations[Math.floor(Math.random() * loveLocations.length)]; sendGameBotMsg(`💘 **Love Dice Rolled:**\nAction: ${a}\nLocation: ${l}`); }
         function flipCoin() { document.getElementById('coin-emoji').classList.add('spinning'); setTimeout(() => { document.getElementById('coin-emoji').classList.remove('spinning'); let result = Math.random() < 0.5 ? "Heads" : "Tails"; sendGameBotMsg(`🪙 **Coin Flip:** It landed on **${result}**!`); }, 1500); }
-        function pickRPS(choice) { document.getElementById('rps-status').innerText = "Waiting for partner..."; document.getElementById('rps-controls').style.display = 'none'; socket.emit('rps pick', choice); } 
-        socket.on('rps waiting', () => { document.getElementById('rps-status').innerText = "Partner is ready! Pick!"; }); socket.on('rps clear', () => { document.getElementById('rps-status').innerText = "Pick your weapon!"; document.getElementById('rps-controls').style.display = 'flex'; document.getElementById('rps-showdown').style.display = 'none'; }); 
-        socket.on('rps result', (res) => { let status = document.getElementById('rps-status'); let showdown = document.getElementById('rps-showdown'); status.innerText = "Rock..."; showdown.style.display = 'block'; showdown.classList.add('bouncing'); showdown.innerText = '✊'; setTimeout(() => { status.innerText = "Paper..."; showdown.innerText = '✋'; }, 600); setTimeout(() => { status.innerText = "Scissors..."; showdown.innerText = '✌️'; }, 1200); setTimeout(() => { showdown.classList.remove('bouncing'); let myPick = res.id1 === socket.id ? res.choice1 : res.choice2; let theirPick = res.id1 === socket.id ? res.choice2 : res.choice1; status.innerText = `You: ${myPick} vs Them: ${theirPick}`; showdown.innerText = myPick; sendGameBotMsg(`👊📄✌️ **RPS Match!**\nMe: ${myPick}\nYou: ${theirPick}`); }, 1800); });
+        function pickRPS(choice) { document.getElementById('rps-status').innerText = "Waiting for partner..."; document.getElementById('rps-controls').style.display = 'none'; socket.emit('rps pick', choice); } socket.on('rps waiting', () => { document.getElementById('rps-status').innerText = "Partner is ready! Pick!"; }); socket.on('rps clear', () => { document.getElementById('rps-status').innerText = "Pick your weapon!"; document.getElementById('rps-controls').style.display = 'flex'; document.getElementById('rps-showdown').style.display = 'none'; }); socket.on('rps result', (res) => { let status = document.getElementById('rps-status'); let showdown = document.getElementById('rps-showdown'); status.innerText = "Rock..."; showdown.style.display = 'block'; showdown.classList.add('bouncing'); showdown.innerText = '✊'; setTimeout(() => { status.innerText = "Paper..."; showdown.innerText = '✋'; }, 600); setTimeout(() => { status.innerText = "Scissors..."; showdown.innerText = '✌️'; }, 1200); setTimeout(() => { showdown.classList.remove('bouncing'); let myPick = res.id1 === socket.id ? res.choice1 : res.choice2; let theirPick = res.id1 === socket.id ? res.choice2 : res.choice1; status.innerText = `You: ${myPick} vs Them: ${theirPick}`; showdown.innerText = myPick; sendGameBotMsg(`👊📄✌️ **RPS Match!**\nMe: ${myPick}\nYou: ${theirPick}`); }, 1800); });
+
+        // MEMORY
         socket.on('memory update', data => { const grid = document.getElementById('mem-grid'); grid.innerHTML = ''; data.board.forEach((emoji, i) => { let card = document.createElement('div'); card.className = 'mem-card' + (data.matched.includes(i) ? ' matched' : '') + (data.flipped.includes(i) ? ' flipped' : ''); if(data.matched.includes(i) || data.flipped.includes(i)) card.innerText = emoji; card.onclick = () => socket.emit('mem flip', i); grid.appendChild(card); }); if(data.matched.length === 16) { document.getElementById('mem-status').innerText = "🎉 YOU WIN! 🎉"; document.getElementById('mem-grid').classList.add('victory'); } else { document.getElementById('mem-status').innerText = "Pairs"; document.getElementById('mem-grid').classList.remove('victory'); }});
-        socket.on('qd update', state => { let btn = document.getElementById('qd-btn'); let stat = document.getElementById('qd-status'); if(state === 'idle') { btn.style.background = '#333'; btn.innerText = "START"; stat.innerText = "Reaction Test!"; } else if(state === 'wait') { btn.style.background = '#f1c40f'; btn.innerText = "Wait..."; } else if(state === 'go') { btn.style.background = '#2ed573'; btn.innerText = "TAP!"; } else if(state === 'win') { btn.style.background = '#1e90ff'; btn.innerText = "WINNER!"; } else if(state === 'fail') { btn.style.background = '#ff4757'; btn.innerText = "TOO EARLY!"; } });
-        socket.on('balloon update', data => { let bal = document.getElementById('balloon-emoji'); let stat = document.getElementById('balloon-status'); let btn = document.getElementById('balloon-btn'); if(data.popped) { bal.innerText = "💥"; bal.style.transform = "scale(2)"; stat.innerText = (data.popper === socket.id) ? "💥 POPPED! You lose! 💥" : "🎉 THEY POPPED IT! You win! 🎉"; stat.style.color = (data.popper === socket.id) ? "#ff4757" : "#2ed573"; btn.style.display = "none"; stat.style.display = "block"; if(navigator.vibrate) navigator.vibrate(500); } else { bal.innerText = "🎈"; bal.style.transform = `scale(${1 + (data.pumps * 0.15)})`; stat.style.display = "none"; btn.style.display = "block"; } });
         
+        // QUICK DRAW
+        socket.on('qd update', state => { let btn = document.getElementById('qd-btn'); let stat = document.getElementById('qd-status'); if(state === 'idle') { btn.style.background = '#333'; btn.innerText = "START"; stat.innerText = "Reaction Test!"; } else if(state === 'wait') { btn.style.background = '#f1c40f'; btn.innerText = "Wait..."; } else if(state === 'go') { btn.style.background = '#2ed573'; btn.innerText = "TAP!"; } else if(state === 'win') { btn.style.background = '#1e90ff'; btn.innerText = "WINNER!"; } else if(state === 'fail') { btn.style.background = '#ff4757'; btn.innerText = "TOO EARLY!"; } });
+        
+        // BALLOON
+        socket.on('balloon update', data => { let bal = document.getElementById('balloon-emoji'); let stat = document.getElementById('balloon-status'); let btn = document.getElementById('balloon-btn'); if(data.popped) { bal.innerText = "💥"; bal.style.transform = "scale(2)"; stat.innerText = (data.popper === socket.id) ? "💥 POPPED! You lose! 💥" : "🎉 THEY POPPED IT! You win! 🎉"; stat.style.color = (data.popper === socket.id) ? "#ff4757" : "#2ed573"; btn.style.display = "none"; stat.style.display = "block"; if(navigator.vibrate) navigator.vibrate(500); } else { bal.innerText = "🎈"; bal.style.transform = `scale(${1 + (data.pumps * 0.15)})`; stat.style.display = "none"; btn.style.display = "block"; } });
+
+        // --- 🛡️ ANTI-CHEAT CONNECT 4 ---
+        let myC4Role = null; function joinC4(role) { myC4Role = role; document.getElementById('c4-team-select').style.display = 'none'; document.getElementById('c4-game-area').style.display = 'block'; document.getElementById('c4-my-role').innerText = `You are playing: ${role}`; } function leaveC4() { myC4Role = null; document.getElementById('c4-team-select').style.display = 'block'; document.getElementById('c4-game-area').style.display = 'none'; }
+        const c4Grid = document.getElementById('c4-grid'); for(let i=0; i<42; i++) { let cell = document.createElement('div'); cell.className = 'c4-cell'; cell.onclick = () => makeC4Move(i); c4Grid.appendChild(cell); } let c4CurrentTurn = '🔴'; let localC4State = Array(42).fill(null); let c4Active = true; 
+        function makeC4Move(idx) { if(!c4Active) return; if(c4CurrentTurn !== myC4Role) { let stat = document.getElementById('c4-status'); stat.classList.add('shake-error'); setTimeout(() => { stat.classList.remove('shake-error'); }, 300); return; } let col = idx % 7; let targetIdx = -1; for(let r = 5; r >= 0; r--) { let i = r * 7 + col; if(!localC4State[i]) { targetIdx = i; break; } } if(targetIdx !== -1) socket.emit('c4 move', { index: targetIdx, symbol: c4CurrentTurn }); } 
+        socket.on('c4 update', state => { const cells = document.querySelectorAll('#c4-grid .c4-cell'); let rCount = 0; let yCount = 0; state.forEach((val, i) => { let chipClass = ''; if(val === '🔴') { chipClass = 'chip-red'; rCount++; } else if(val === '🟡') { chipClass = 'chip-yellow'; yCount++; } if(val !== localC4State[i] && val !== null) { cells[i].innerHTML = `<div class="${chipClass} drop-anim"></div>`; } else if (val) { cells[i].innerHTML = `<div class="${chipClass}"></div>`; } else { cells[i].innerHTML = ''; } }); localC4State = state; c4CurrentTurn = (rCount > yCount) ? '🟡' : '🔴'; document.getElementById('c4-status').innerText = `${c4CurrentTurn}'s Turn`; let won = false; for(let r=0; r<6; r++) { for(let c=0; c<7; c++) { let sym = state[r*7+c]; if(!sym) continue; if(c<=3 && sym==state[r*7+c+1] && sym==state[r*7+c+2] && sym==state[r*7+c+3]) won = sym; if(r<=2 && sym==state[(r+1)*7+c] && sym==state[(r+2)*7+c] && sym==state[(r+3)*7+c]) won = sym; if(c<=3 && r<=2 && sym==state[(r+1)*7+c+1] && sym==state[(r+2)*7+c+2] && sym==state[(r+3)*7+c+3]) won = sym; if(c<=3 && r>=3 && sym==state[(r-1)*7+c+1] && sym==state[(r-2)*7+c+2] && sym==state[(r-3)*7+c+3]) won = sym; } } if(won) { document.getElementById('c4-status').innerText = `🎉 ${won} WINS!`; c4Active = false; } else if(!state.includes(null)) { document.getElementById('c4-status').innerText = `It's a Draw!`; c4Active = false; } else c4Active = true; }); 
+        
+        // TAP BATTLE
         let myTapTeam = null; function joinTap(team) { myTapTeam = team; document.getElementById('tap-team-select').style.display = 'none'; document.getElementById('tap-btn').style.display = 'block'; document.getElementById('tap-btn').style.background = team === 'red' ? '#ff4757' : '#1e90ff'; } function pullTap() { if(myTapTeam) socket.emit('tap pull', myTapTeam); } socket.on('tap update', score => { document.getElementById('tap-bar-red').style.width = score + '%'; if(score >= 100) { document.getElementById('tap-status').innerText = '🎉 RED WINS!'; document.getElementById('tap-btn').style.display='none'; document.getElementById('tap-reset-btn').style.display='inline-block'; } else if(score <= 0) { document.getElementById('tap-status').innerText = '🎉 BLUE WINS!'; document.getElementById('tap-btn').style.display='none'; document.getElementById('tap-reset-btn').style.display='inline-block'; } else { if(myTapTeam) { document.getElementById('tap-btn').style.display='inline-block'; document.getElementById('tap-reset-btn').style.display='none'; document.getElementById('tap-status').innerText = `Tug of War`; } } });
 
         // --- 🛡️ ANTI-CHEAT TIC-TAC-TOE ---
-        let myTTTRole = null; 
-        function joinTTT(role) { myTTTRole = role; document.getElementById('ttt-team-select').style.display = 'none'; document.getElementById('ttt-game-area').style.display = 'block'; document.getElementById('ttt-my-role').innerText = `You are playing: ${role === 'X' ? '❌' : '⭕'}`; }
-        function leaveTTT() { myTTTRole = null; document.getElementById('ttt-team-select').style.display = 'block'; document.getElementById('ttt-game-area').style.display = 'none'; }
-        
+        let myTTTRole = null; function joinTTT(role) { myTTTRole = role; document.getElementById('ttt-team-select').style.display = 'none'; document.getElementById('ttt-game-area').style.display = 'block'; document.getElementById('ttt-my-role').innerText = `You are playing: ${role === 'X' ? '❌' : '⭕'}`; } function leaveTTT() { myTTTRole = null; document.getElementById('ttt-team-select').style.display = 'block'; document.getElementById('ttt-game-area').style.display = 'none'; }
         let currentTurn = 'X'; let localGameState = Array(9).fill(null); let oldTttState = Array(9).fill(null); let gameActive = true; 
-        function makeMove(idx) { 
-            if (localGameState[idx] || !gameActive) return; 
-            // BLOCKS CHEATERS
-            if (currentTurn !== myTTTRole) {
-                let stat = document.getElementById('ttt-status'); stat.classList.add('shake-error');
-                setTimeout(() => { stat.classList.remove('shake-error'); }, 300);
-                return;
-            }
-            socket.emit('make move', { index: idx, symbol: currentTurn }); 
-        } 
+        function makeMove(idx) { if (localGameState[idx] || !gameActive) return; if (currentTurn !== myTTTRole) { let stat = document.getElementById('ttt-status'); stat.classList.add('shake-error'); setTimeout(() => { stat.classList.remove('shake-error'); }, 300); return; } socket.emit('make move', { index: idx, symbol: currentTurn }); } 
         socket.on('game update', state => { localGameState = state; const cells = document.querySelectorAll('#ttt-grid .cell'); let xCount = 0; let oCount = 0; cells.forEach(c => c.classList.remove('winning-cell')); state.forEach((val, i) => { if(val !== oldTttState[i] && val !== null) { cells[i].classList.add('pop-in'); setTimeout(()=>cells[i].classList.remove('pop-in'), 300); } if(val === 'X') { cells[i].innerHTML = '<span style="color:#ff4757; text-shadow: 0 0 15px #ff4757;">❌</span>'; xCount++; } else if(val === 'O') { cells[i].innerHTML = '<span style="color:#00f2fe; text-shadow: 0 0 15px #00f2fe;">⭕</span>'; oCount++; } else { cells[i].innerHTML = ''; } }); oldTttState = [...state]; currentTurn = (xCount > oCount) ? 'O' : 'X'; document.getElementById('ttt-status').innerText = `${currentTurn === 'X' ? '❌' : '⭕'}'s Turn`; checkWinAndDraw(state); }); 
         function checkWinAndDraw(state) { const winConditions = [ [0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6] ]; let roundWon = false; for (let i = 0; i < winConditions.length; i++) { const winCondition = winConditions[i]; let a = state[winCondition[0]], b = state[winCondition[1]], c = state[winCondition[2]]; if (a === null || b === null || c === null) continue; if (a === b && b === c) { roundWon = true; document.querySelectorAll('#ttt-grid .cell')[winCondition[0]].classList.add('winning-cell'); document.querySelectorAll('#ttt-grid .cell')[winCondition[1]].classList.add('winning-cell'); document.querySelectorAll('#ttt-grid .cell')[winCondition[2]].classList.add('winning-cell'); document.getElementById('ttt-status').innerText = `🎉 ${a === 'X' ? '❌' : '⭕'} WINS! 🎉`; gameActive = false; break; } } if (!roundWon && !state.includes(null)) { document.getElementById('ttt-status').innerText = `It's a Draw! 🤝`; gameActive = false; } else if (!roundWon) { gameActive = true; } }
 
-        // --- 🛡️ ANTI-CHEAT CONNECT 4 ---
-        let myC4Role = null;
-        function joinC4(role) { myC4Role = role; document.getElementById('c4-team-select').style.display = 'none'; document.getElementById('c4-game-area').style.display = 'block'; document.getElementById('c4-my-role').innerText = `You are playing: ${role}`; }
-        function leaveC4() { myC4Role = null; document.getElementById('c4-team-select').style.display = 'block'; document.getElementById('c4-game-area').style.display = 'none'; }
-
-        const c4Grid = document.getElementById('c4-grid'); for(let i=0; i<42; i++) { let cell = document.createElement('div'); cell.className = 'c4-cell'; cell.onclick = () => makeC4Move(i); c4Grid.appendChild(cell); } let c4CurrentTurn = '🔴'; let localC4State = Array(42).fill(null); let c4Active = true; 
-        function makeC4Move(idx) { 
-            if(!c4Active) return; 
-            // BLOCKS CHEATERS
-            if(c4CurrentTurn !== myC4Role) {
-                let stat = document.getElementById('c4-status'); stat.classList.add('shake-error');
-                setTimeout(() => { stat.classList.remove('shake-error'); }, 300);
-                return;
-            }
-            let col = idx % 7; let targetIdx = -1; for(let r = 5; r >= 0; r--) { let i = r * 7 + col; if(!localC4State[i]) { targetIdx = i; break; } } if(targetIdx !== -1) socket.emit('c4 move', { index: targetIdx, symbol: c4CurrentTurn }); 
-        } 
-        socket.on('c4 update', state => { const cells = document.querySelectorAll('#c4-grid .c4-cell'); let rCount = 0; let yCount = 0; state.forEach((val, i) => { let chipClass = ''; if(val === '🔴') { chipClass = 'chip-red'; rCount++; } else if(val === '🟡') { chipClass = 'chip-yellow'; yCount++; } if(val !== localC4State[i] && val !== null) { cells[i].innerHTML = `<div class="${chipClass} drop-anim"></div>`; } else if (val) { cells[i].innerHTML = `<div class="${chipClass}"></div>`; } else { cells[i].innerHTML = ''; } }); localC4State = state; c4CurrentTurn = (rCount > yCount) ? '🟡' : '🔴'; document.getElementById('c4-status').innerText = `${c4CurrentTurn}'s Turn`; let won = false; for(let r=0; r<6; r++) { for(let c=0; c<7; c++) { let sym = state[r*7+c]; if(!sym) continue; if(c<=3 && sym==state[r*7+c+1] && sym==state[r*7+c+2] && sym==state[r*7+c+3]) won = sym; if(r<=2 && sym==state[(r+1)*7+c] && sym==state[(r+2)*7+c] && sym==state[(r+3)*7+c]) won = sym; if(c<=3 && r<=2 && sym==state[(r+1)*7+c+1] && sym==state[(r+2)*7+c+2] && sym==state[(r+3)*7+c+3]) won = sym; if(c<=3 && r>=3 && sym==state[(r-1)*7+c+1] && sym==state[(r-2)*7+c+2] && sym==state[(r-3)*7+c+3]) won = sym; } } if(won) { document.getElementById('c4-status').innerText = `🎉 ${won} WINS!`; c4Active = false; } else if(!state.includes(null)) { document.getElementById('c4-status').innerText = `It's a Draw!`; c4Active = false; } else c4Active = true; }); 
-        
         // DRAWING
         const canvas = document.getElementById('draw-board'); const ctx = canvas.getContext('2d'); ctx.lineCap = 'round'; ctx.lineJoin = 'round'; let drawing = false; let brushColor = '#ff4757'; let brushSize = 4; function setBrush(color) { brushColor = color; } function updateSize(size) { brushSize = size; } function getPos(e) { const rect = canvas.getBoundingClientRect(); return { x: (e.touches ? e.touches[0].clientX : e.clientX) - rect.left, y: (e.touches ? e.touches[0].clientY : e.clientY) - rect.top }; } function startDraw(e) { drawing = true; const pos = getPos(e); socket.emit('draw', { type: 'start', x: pos.x, y: pos.y, color: brushColor, size: brushSize }); ctx.beginPath(); ctx.strokeStyle = brushColor; ctx.lineWidth = brushSize; ctx.moveTo(pos.x, pos.y); e.preventDefault(); } function drawLine(e) { if (!drawing) return; const pos = getPos(e); socket.emit('draw', { type: 'draw', x: pos.x, y: pos.y, color: brushColor, size: brushSize }); ctx.strokeStyle = brushColor; ctx.lineWidth = brushSize; ctx.lineTo(pos.x, pos.y); ctx.stroke(); e.preventDefault(); } function stopDraw() { drawing = false; ctx.beginPath(); } canvas.addEventListener('mousedown', startDraw); canvas.addEventListener('mousemove', drawLine); canvas.addEventListener('mouseup', stopDraw); canvas.addEventListener('touchstart', startDraw, {passive: false}); canvas.addEventListener('touchmove', drawLine, {passive: false}); canvas.addEventListener('touchend', stopDraw); socket.on('draw', data => { if (data.type === 'start') { ctx.beginPath(); ctx.strokeStyle = data.color || '#ff4757'; ctx.lineWidth = data.size || 4; ctx.moveTo(data.x, data.y); } else if (data.type === 'draw') { ctx.strokeStyle = data.color || '#ff4757'; ctx.lineWidth = data.size || 4; ctx.lineTo(data.x, data.y); ctx.stroke(); } else if (data.type === 'clear') { ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.beginPath(); } }); function clearCanvas() { socket.emit('draw', { type: 'clear' }); ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.beginPath(); }
 
